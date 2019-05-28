@@ -72,6 +72,7 @@ public class CreateRandomPlane : MonoBehaviour
         int iterations = (int)Mathf.Log(numberDivisions, 2);
         int numSquares = 1;
         int squareSize = numberDivisions;
+        float tmpMaximumGenerateHeight = maximumGenerateHeight;
         for (int i = 0; i < iterations; i++)
         {
             int row = 0;
@@ -80,7 +81,7 @@ public class CreateRandomPlane : MonoBehaviour
                 int col = 0;
                 for (int k = 0; k < numSquares; k++)
                 {
-                    DiamondSquareAlgorithm(row, col, squareSize, maximumGenerateHeight);
+                    DiamondSquareAlgorithm(row, col, squareSize, tmpMaximumGenerateHeight);
                     col += squareSize;
 
                 }
@@ -88,7 +89,7 @@ public class CreateRandomPlane : MonoBehaviour
             }
             numSquares *= 2;
             squareSize /= 2;
-            maximumGenerateHeight *= 0.5f;
+            tmpMaximumGenerateHeight *= 0.5f;
 
         }
 
