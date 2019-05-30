@@ -348,8 +348,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberDivisions: 128
-  sizeOfGerneratedPlane: 30
+  sizeOfGerneratedPlane: 45
   maximumGenerateHeight: 10
+  offset: 0
 --- !u!23 &773758890
 MeshRenderer:
   m_ObjectHideFlags: 0

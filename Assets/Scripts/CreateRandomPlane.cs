@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class CreateRandomPlane : MonoBehaviour
 {
-    public int numberDivisions;
-    public float sizeOfGerneratedPlane;
-    public float maximumGenerateHeight;
+    public int numberDivisions = 128;
+    public float sizeOfGerneratedPlane = 30;
+    public float maximumGenerateHeight = 10;
+    public int offset = 0;
 
     // https://docs.unity3d.com/ScriptReference/Mesh.html 
     //necessary for mesh
@@ -63,14 +64,15 @@ public class CreateRandomPlane : MonoBehaviour
             }
         }
 
-        vertices[0].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight);
-        vertices[numberDivisions].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight);
-        vertices[vertices.Length - 1].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight);
-        vertices[vertices.Length - 1 - numberDivisions].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight);
+        vertices[0].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight)+offset;
+        vertices[numberDivisions].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight)+offset;
+        vertices[vertices.Length - 1].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight)+offset;
+        vertices[vertices.Length - 1 - numberDivisions].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight)+offset;
 
         int iterations = (int)Mathf.Log(numberDivisions, 2);
         int numSquares = 1;
         int squareSize = numberDivisions;
+        float tmpMaximumGenerateHeight = maximumGenerateHeight;
         for (int i = 0; i < iterations; i++)
         {
             int row = 0;
@@ -79,7 +81,7 @@ public class CreateRandomPlane : MonoBehaviour
                 int col = 0;
                 for (int k = 0; k < numSquares; k++)
                 {
-                    DiamondSquareAlgorithm(row, col, squareSize, maximumGenerateHeight);
+                    DiamondSquareAlgorithm(row, col, squareSize, tmpMaximumGenerateHeight);
                     col += squareSize;
 
                 }
@@ -87,7 +89,7 @@ public class CreateRandomPlane : MonoBehaviour
             }
             numSquares *= 2;
             squareSize /= 2;
-            maximumGenerateHeight *= 0.5f;
+            tmpMaximumGenerateHeight *= 0.5f;
 
         }
 
