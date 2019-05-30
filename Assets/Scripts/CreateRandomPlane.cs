@@ -35,6 +35,7 @@ public class CreateRandomPlane : MonoBehaviour
         float divisionSize = sizeOfGerneratedPlane / numberDivisions;
 
         mesh = new Mesh();
+        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
 
         int triOffset = 0;
