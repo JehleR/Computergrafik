@@ -42,8 +42,8 @@ Shader "Unlit/ColorTerrainShader"
 		{
 			// vertex positions in homogeneous coordinates
 			float4 pos : SV_POSITION;
-			// base vertice color
-			float4 color : COLOR0;
+			// global vertex POSITION
+			float3 worldPos : TEXCOORD0;
 			// ambient light color
 			float4 amb : COLOR1;
 			// diffuse light color
@@ -59,12 +59,9 @@ Shader "Unlit/ColorTerrainShader"
 			// transform vertices from object coordinates to clip coordinates
 			vertexOut.pos = UnityObjectToClipPos(vertexIn.vertex);
 
-			float4 worldPos = mul(unity_ObjectToWorld, vertexIn.vertex);
-			vertexOut.color = float4(0, worldPos.y, 0, 0) / 10;
+			// Get world position of vertex
+			vertexOut.worldPos = mul(unity_ObjectToWorld, vertexIn.vertex);
 
-			if (worldPos.y <= 0) {
-				vertexOut.color.rgb = float3(0, 0, 139);
-			}
 			// transform normal vectors to world coordinates
 			half3 worldNormal = UnityObjectToWorldNormal(vertexIn.normal);
 
@@ -75,15 +72,17 @@ Shader "Unlit/ColorTerrainShader"
 			half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
 			vertexOut.diff = nl * _LightColor0;
 
-			// pass through the vertice color
-			//vertexOut.color = vertexIn.color;
 			return vertexOut;
 		}
 
 		// FRAGMENT SHADER
 		float4 frag(v2f fragIn) : SV_Target{
-			// set base color
-			float4 color = fragIn.color;
+			// set color based on height
+			float4 color = float4(0, fragIn.worldPos.y, 0, 0) / 10;
+
+			if (fragIn.worldPos.y <= 0) {
+				color.rgb = float3(0, 0, 139);
+			}
 
 			// multiply base color with ambient and diffuse light
 			color *= (_Ka * fragIn.amb + _Kd * fragIn.diff);
