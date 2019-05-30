@@ -94,6 +94,7 @@ public class CreateRandomPlane : MonoBehaviour
 
         }
 
+        removeNegativeValues(vertices);
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = trianglesForPlane;
@@ -121,12 +122,14 @@ public class CreateRandomPlane : MonoBehaviour
 
         
     }
-    int removeNegativeValues(int value)
+    void removeNegativeValues(Vector3[] vertices)
     {
-        if(value < 0)
+        for(int i = 0; i < vertices.Length; i++)
         {
-            value = 0;
+            if(vertices[i].y < 0)
+            {
+                vertices[i].y = 0;
+            }
         }
-        return value;
     }
 }
