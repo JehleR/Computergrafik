@@ -34,7 +34,7 @@ public class CreateRandomPlane : MonoBehaviour
             {
                 scrollWheel = Input.GetAxis("Mouse ScrollWheel");
                 //Debug.Log(Input.mousePosition);
-                Debug.Log("+ an Höhe: " + scrollWheel);
+                //Debug.Log("+ an Höhe: " + scrollWheel);
                 updateHeight(scrollWheel, Input.mousePosition);
 
             }
@@ -42,7 +42,8 @@ public class CreateRandomPlane : MonoBehaviour
             {
                 scrollWheel = Input.GetAxis("Mouse ScrollWheel");
                 //Debug.Log(Input.mousePosition);
-                Debug.Log("- an Höhe: " + scrollWheel);
+                //Debug.Log("- an Höhe: " + scrollWheel);
+                updateHeight(scrollWheel, Input.mousePosition);
             }
 
         }
@@ -50,7 +51,14 @@ public class CreateRandomPlane : MonoBehaviour
 
     void updateHeight(float scrollWheel, Vector3 position)
     {
-       updateMesh(vertices);
+        int scale = 1;
+        //über die position wird noch diskutiert
+        vertices[(int)position[0]].y += scrollWheel * scale;
+        if (vertices[(int)position[0]].y < 0)
+        {
+            vertices[(int)position[0]].y = 0;
+        }
+        updateMesh(vertices);
     }
 
     void createRandomPlane()
