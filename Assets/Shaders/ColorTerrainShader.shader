@@ -9,6 +9,10 @@ Shader "Unlit/ColorTerrainShader"
 
 		// Reflectance of the diffuse light
 		_Kd("Diffuse Reflectance", Range(0, 1)) = 0.5
+
+		// Colormap
+		_ColorTex("Color Texture", 2D) = "white" {}
+
 	}
 
 	SubShader
@@ -48,9 +52,13 @@ Shader "Unlit/ColorTerrainShader"
 			float4 amb : COLOR1;
 			// diffuse light color
 			float4 diff : COLOR2;
+
+			// height color based on Colormap
+			float4 heightColor : COLOR3;
 		};
 
 		float _Ka, _Kd;
+		sampler2D _ColorTex;
 
 		// VERTEX SHADER
 		v2f vert(appdata_full vertexIn)
@@ -72,19 +80,23 @@ Shader "Unlit/ColorTerrainShader"
 			half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
 			vertexOut.diff = nl * _LightColor0;
 
+			float4 heightColor = vertexIn.vertex.y <= 10 ? tex2Dlod(_ColorTex, float4(0, vertexIn.vertex.y / 10, 0, 0)) : tex2Dlod(_ColorTex, float4(0, 0.99, 0, 0));
+			vertexOut.heightColor = heightColor;
+
 			return vertexOut;
 		}
 
 		// FRAGMENT SHADER
 		float4 frag(v2f fragIn) : SV_Target{
 			// set color based on height
-			float4 color = float4(0, fragIn.worldPos.y, 0, 0) / 10;
+			float4 color = fragIn.heightColor;
 			float contourLineFatness = 0.03;
+			float contourInterval = 1;
 
 			if (fragIn.worldPos.y <= 0) {
 				color.rgb = float3(0, 0, 139);
-			} else if (fragIn.worldPos.y % 1 < contourLineFatness && fragIn.worldPos.y > contourLineFatness) {
-				color.rgb = float3(255, 0, 0);
+			} else if (fragIn.worldPos.y % contourInterval < contourLineFatness && fragIn.worldPos.y > contourLineFatness) {
+				color.rgb = float3(0.545, 0.271, 0.075);
 			}
 
 			// multiply base color with ambient and diffuse light
