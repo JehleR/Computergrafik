@@ -51,7 +51,7 @@ public class CreateRandomPlane : MonoBehaviour
 
     void updateHeight(float scrollWheel, Vector3 position)
     {
-        int scale = 1;
+        int scale = 5;
         //über die position wird noch diskutiert
         vertices[(int)position[0]].y += scrollWheel * scale;
         if (vertices[(int)position[0]].y < 0)
