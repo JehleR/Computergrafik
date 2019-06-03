@@ -79,9 +79,12 @@ Shader "Unlit/ColorTerrainShader"
 		float4 frag(v2f fragIn) : SV_Target{
 			// set color based on height
 			float4 color = float4(0, fragIn.worldPos.y, 0, 0) / 10;
+			float contourLineFatness = 0.03;
 
 			if (fragIn.worldPos.y <= 0) {
 				color.rgb = float3(0, 0, 139);
+			} else if (fragIn.worldPos.y % 1 < contourLineFatness && fragIn.worldPos.y > contourLineFatness) {
+				color.rgb = float3(255, 0, 0);
 			}
 
 			// multiply base color with ambient and diffuse light
