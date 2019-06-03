@@ -52,9 +52,6 @@ Shader "Unlit/ColorTerrainShader"
 			float4 amb : COLOR1;
 			// diffuse light color
 			float4 diff : COLOR2;
-
-			// height color based on Colormap
-			float4 heightColor : COLOR3;
 		};
 
 		float _Ka, _Kd;
@@ -80,16 +77,14 @@ Shader "Unlit/ColorTerrainShader"
 			half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
 			vertexOut.diff = nl * _LightColor0;
 
-			float4 heightColor = vertexIn.vertex.y <= 10 ? tex2Dlod(_ColorTex, float4(0, vertexIn.vertex.y / 10, 0, 0)) : tex2Dlod(_ColorTex, float4(0, 0.99, 0, 0));
-			vertexOut.heightColor = heightColor;
-
 			return vertexOut;
 		}
 
 		// FRAGMENT SHADER
 		float4 frag(v2f fragIn) : SV_Target{
 			// set color based on height
-			float4 color = fragIn.heightColor;
+			float4 color = fragIn.worldPos.y <= 10 ? tex2Dlod(_ColorTex, float4(0, fragIn.worldPos.y / 10, 0, 0)) : tex2Dlod(_ColorTex, float4(0, 0.99, 0, 0));
+
 			float contourLineFatness = 0.03;
 			float contourInterval = 1;
 
