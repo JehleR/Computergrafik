@@ -24,6 +24,35 @@ public class CreateRandomPlane : MonoBehaviour
     }
 
     // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
+            //Debug.Log("Triggered: " + scrollWheel);
+            if (Input.GetAxis("Mouse ScrollWheel") > 0f)
+            {
+                scrollWheel = Input.GetAxis("Mouse ScrollWheel");
+                //Debug.Log(Input.mousePosition);
+                Debug.Log("+ an Höhe: " + scrollWheel);
+                updateHeight(scrollWheel, Input.mousePosition);
+
+            }
+            if (Input.GetAxis("Mouse ScrollWheel") < 0f)
+            {
+                scrollWheel = Input.GetAxis("Mouse ScrollWheel");
+                //Debug.Log(Input.mousePosition);
+                Debug.Log("- an Höhe: " + scrollWheel);
+            }
+
+        }
+    }
+
+    void updateHeight(float scrollWheel, Vector3 position)
+    {
+       updateMesh(vertices);
+    }
+
     void createRandomPlane()
     {
         verticeCounter = (numberDivisions + 1) * (numberDivisions + 1);
@@ -40,11 +69,11 @@ public class CreateRandomPlane : MonoBehaviour
 
         int triOffset = 0;
 
-        for (int i = 0;i<= numberDivisions; i++)
+        for (int i = 0; i <= numberDivisions; i++)
         {
             for (int j = 0; j <= numberDivisions; j++)
             {
-                vertices[i * (numberDivisions + 1) + j] = new Vector3(-halfSize+j*divisionSize, 0.0f,halfSize-i*divisionSize);
+                vertices[i * (numberDivisions + 1) + j] = new Vector3(-halfSize + j * divisionSize, 0.0f, halfSize - i * divisionSize);
                 uv[i * (numberDivisions + 1) + j] = new Vector2((float)i / numberDivisions, (float)j / numberDivisions);
 
                 if (i < numberDivisions && j < numberDivisions)
@@ -65,10 +94,10 @@ public class CreateRandomPlane : MonoBehaviour
             }
         }
 
-        vertices[0].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight)+offset;
-        vertices[numberDivisions].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight)+offset;
-        vertices[vertices.Length - 1].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight)+offset;
-        vertices[vertices.Length - 1 - numberDivisions].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight)+offset;
+        vertices[0].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight) + offset;
+        vertices[numberDivisions].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight) + offset;
+        vertices[vertices.Length - 1].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight) + offset;
+        vertices[vertices.Length - 1 - numberDivisions].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight) + offset;
 
         int iterations = (int)Mathf.Log(numberDivisions, 2);
         int numSquares = 1;
@@ -95,6 +124,11 @@ public class CreateRandomPlane : MonoBehaviour
         }
 
         removeNegativeValues(vertices);
+        updateMesh(vertices);
+    }
+
+    void updateMesh(Vector3[] vertices)
+    {
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = trianglesForPlane;
@@ -103,7 +137,7 @@ public class CreateRandomPlane : MonoBehaviour
         mesh.RecalculateNormals();
     }
 
-    void DiamondSquareAlgorithm(int row, int col, int size , float offset)
+    void DiamondSquareAlgorithm(int row, int col, int size, float offset)
     {
         int halfSquareSize = (int)(size * 0.5f);
         int pointLeftTop = row * (numberDivisions + 1) + col;
@@ -113,23 +147,26 @@ public class CreateRandomPlane : MonoBehaviour
         //pointLeftBottom = removeNegativeValues(pointLeftBottom);
 
         int middle = (int)(row + halfSquareSize) * (numberDivisions + 1) + (int)(col + halfSquareSize);
-        vertices[middle].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y+vertices[pointLeftBottom].y+vertices[pointLeftBottom+size].y)*0.25f+Random.Range(-offset,offset);
+        vertices[middle].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y + vertices[pointLeftBottom].y + vertices[pointLeftBottom + size].y) * 0.25f + Random.Range(-offset, offset);
 
-        vertices[pointLeftTop + halfSquareSize].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y + vertices[middle].y)/3+Random.Range(-offset,offset);
-        vertices[middle-halfSquareSize].y = (vertices[pointLeftTop].y + vertices[pointLeftBottom].y + vertices[middle].y)/3 + Random.Range(-offset, offset);
-        vertices[middle + halfSquareSize].y = (vertices[pointLeftTop+size].y + vertices[pointLeftBottom+size].y + vertices[middle].y)/3 + Random.Range(-offset, offset);
+        vertices[pointLeftTop + halfSquareSize].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y + vertices[middle].y) / 3 + Random.Range(-offset, offset);
+        vertices[middle - halfSquareSize].y = (vertices[pointLeftTop].y + vertices[pointLeftBottom].y + vertices[middle].y) / 3 + Random.Range(-offset, offset);
+        vertices[middle + halfSquareSize].y = (vertices[pointLeftTop + size].y + vertices[pointLeftBottom + size].y + vertices[middle].y) / 3 + Random.Range(-offset, offset);
         vertices[pointLeftBottom + halfSquareSize].y = (vertices[pointLeftBottom].y + vertices[pointLeftBottom + size].y + vertices[middle].y) / 3 + Random.Range(-offset, offset);
 
-        
+
     }
     void removeNegativeValues(Vector3[] vertices)
     {
-        for(int i = 0; i < vertices.Length; i++)
+        for (int i = 0; i < vertices.Length; i++)
         {
-            if(vertices[i].y < 0)
+            if (vertices[i].y < 0)
             {
                 vertices[i].y = 0;
             }
         }
     }
+
+
+   
 }
