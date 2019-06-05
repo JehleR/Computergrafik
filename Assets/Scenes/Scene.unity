@@ -472,8 +472,8 @@ MonoBehaviour:
   sizeOfGerneratedPlane: 45
   maximumGenerateHeight: 10
   offset: 0
-  scrollScale: 10
-  meshCollider: {fileID: 773758891}
+  variance: 10
+  meshCollider: {fileID: 0}
 --- !u!23 &773758890
 MeshRenderer:
   m_ObjectHideFlags: 0
