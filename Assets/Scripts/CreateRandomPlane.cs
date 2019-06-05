@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ public class CreateRandomPlane : MonoBehaviour
     public float sizeOfGerneratedPlane = 30;
     public float maximumGenerateHeight = 10;
     public int offset = 0;
+    public int scrollScale = 5;
+    double variance = 2;
 
     public MeshCollider meshCollider ;
 
@@ -42,7 +45,7 @@ public class CreateRandomPlane : MonoBehaviour
             {
                 scrollWheel = Input.GetAxis("Mouse ScrollWheel");
                 //Debug.Log(Input.mousePosition);
-                Debug.Log("Erhöhung: " + scrollWheel);
+                //Debug.Log("Erhöhung: " + scrollWheel);
                 updateHeight(scrollWheel, index);
 
             }
@@ -98,14 +101,57 @@ public class CreateRandomPlane : MonoBehaviour
 
     void updateHeight(float scrollWheel, int position)
     {
-        int scale = 5;
+        
+        scrollWheel *= scrollScale;
         //über die position wird noch diskutiert
-        vertices[position].y += scrollWheel * scale;
-        if (vertices[position].y < 0)
-        {
-            vertices[position].y = 0;
-        }
+        moveVertices(scrollWheel, position);
         updateMesh(vertices);
+    }
+
+    void moveVertices(float delta, int index)
+    {
+        Vector3[] tmpVerts = vertices;
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            if (i == index)
+            {
+                //Debug.Log(tmpVerts[i].y); //Debug.Log(delta);if ((tmpVerts[i].y += delta) < 0){tmpVerts[i].y = 0;}
+                //x direction to the right
+                for (int j = i; j < i + 4; j++)
+                {
+                    if (delta < 0)
+                    {
+                        tmpVerts[j].y -= Math.Abs(delta)*((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2)))* Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x), 2) / (2 * Math.Pow(variance, 2))))));
+                        tmpVerts[j + numberDivisions].y -= Math.Abs(delta)*((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) *Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x), 2) / (2 * Math.Pow(variance, 2))))));
+                    } else{
+                        tmpVerts[j].y += Math.Abs(delta)* ((float)(1/(Math.Sqrt(2*Math.PI* Math.Pow(variance,2))) *Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x),2)/(2*Math.Pow(variance,2))))));
+                        tmpVerts[j + numberDivisions].y += Math.Abs(delta) *((float)(1/(Math.Sqrt(2*Math.PI* Math.Pow(variance,2)))* Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x),2)/(2*Math.Pow(variance,2))))));
+                    }
+                    if (tmpVerts[j].y< 0)
+                    {
+                        tmpVerts[j].y = 0;
+                    }
+                }
+                //x direction to the left
+                for(int j = i; j<i-4; j--)
+                {
+                    if(delta<0){
+                        tmpVerts[j].y -= Math.Abs(delta)* ((float)(1/(Math.Sqrt(2* Math.PI*Math.Pow(variance,2)))* Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x),2)/(2* Math.Pow(variance,2))))));
+                        tmpVerts[j - numberDivisions].y -= Math.Abs(delta) *((float)(1/(Math.Sqrt(2* Math.PI*Math.Pow(variance,2))) *Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x),2)/(2* Math.Pow(variance,2))))));
+                    } else{
+                        tmpVerts[j].y += Math.Abs(delta)* ((float)(1/(Math.Sqrt(2* Math.PI*Math.Pow(variance,2)))* Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x),2)/(2* Math.Pow(variance,2))))));
+                        tmpVerts[j - numberDivisions].y += Math.Abs(delta)* ((float)(1/(Math.Sqrt(2* Math.PI*Math.Pow(variance,2)))* Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x),2)/(2* Math.Pow(variance,2))))));
+                    }
+                    if(tmpVerts[j].y< 0)
+                    {
+                        tmpVerts[j].y = 0;
+                    }
+                }
+                //tmpVerts[i].y = tmpVerts[i].y*2;
+
+            }
+        }
+        vertices = tmpVerts;
     }
 
 
@@ -150,10 +196,10 @@ public class CreateRandomPlane : MonoBehaviour
             }
         }
 
-        vertices[0].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight) + offset;
-        vertices[numberDivisions].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight) + offset;
-        vertices[vertices.Length - 1].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight) + offset;
-        vertices[vertices.Length - 1 - numberDivisions].y = Random.Range(-maximumGenerateHeight, maximumGenerateHeight) + offset;
+        vertices[0].y = UnityEngine.Random.Range(-maximumGenerateHeight, maximumGenerateHeight) + offset;
+        vertices[numberDivisions].y = UnityEngine.Random.Range(-maximumGenerateHeight, maximumGenerateHeight) + offset;
+        vertices[vertices.Length - 1].y = UnityEngine.Random.Range(-maximumGenerateHeight, maximumGenerateHeight) + offset;
+        vertices[vertices.Length - 1 - numberDivisions].y = UnityEngine.Random.Range(-maximumGenerateHeight, maximumGenerateHeight) + offset;
 
         int iterations = (int)Mathf.Log(numberDivisions, 2);
         int numSquares = 1;
@@ -205,12 +251,12 @@ public class CreateRandomPlane : MonoBehaviour
         //pointLeftBottom = removeNegativeValues(pointLeftBottom);
 
         int middle = (int)(row + halfSquareSize) * (numberDivisions + 1) + (int)(col + halfSquareSize);
-        vertices[middle].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y + vertices[pointLeftBottom].y + vertices[pointLeftBottom + size].y) * 0.25f + Random.Range(-offset, offset);
+        vertices[middle].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y + vertices[pointLeftBottom].y + vertices[pointLeftBottom + size].y) * 0.25f + UnityEngine.Random.Range(-offset, offset);
 
-        vertices[pointLeftTop + halfSquareSize].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y + vertices[middle].y) / 3 + Random.Range(-offset, offset);
-        vertices[middle - halfSquareSize].y = (vertices[pointLeftTop].y + vertices[pointLeftBottom].y + vertices[middle].y) / 3 + Random.Range(-offset, offset);
-        vertices[middle + halfSquareSize].y = (vertices[pointLeftTop + size].y + vertices[pointLeftBottom + size].y + vertices[middle].y) / 3 + Random.Range(-offset, offset);
-        vertices[pointLeftBottom + halfSquareSize].y = (vertices[pointLeftBottom].y + vertices[pointLeftBottom + size].y + vertices[middle].y) / 3 + Random.Range(-offset, offset);
+        vertices[pointLeftTop + halfSquareSize].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y + vertices[middle].y) / 3 + UnityEngine.Random.Range(-offset, offset);
+        vertices[middle - halfSquareSize].y = (vertices[pointLeftTop].y + vertices[pointLeftBottom].y + vertices[middle].y) / 3 + UnityEngine.Random.Range(-offset, offset);
+        vertices[middle + halfSquareSize].y = (vertices[pointLeftTop + size].y + vertices[pointLeftBottom + size].y + vertices[middle].y) / 3 + UnityEngine.Random.Range(-offset, offset);
+        vertices[pointLeftBottom + halfSquareSize].y = (vertices[pointLeftBottom].y + vertices[pointLeftBottom + size].y + vertices[middle].y) / 3 + UnityEngine.Random.Range(-offset, offset);
 
 
     }
