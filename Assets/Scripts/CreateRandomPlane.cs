@@ -66,7 +66,7 @@ public class CreateRandomPlane : MonoBehaviour
         //Debug.Log(meshCollider.Raycast(ray, out hit, Mathf.Infinity));
         if (meshCollider.Raycast(ray, out hit, Mathf.Infinity))
         {
-            Debug.Log("hit mesh");
+            //Debug.Log("hit mesh");
             clickpos = hit.point;
             //Debug.Log(clickpos);
             lastClick = clickpos;
@@ -122,6 +122,8 @@ public class CreateRandomPlane : MonoBehaviour
                             tmpVerts[j].y -= Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
                             tmpVerts[j +k* numberDivisions].y -= Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
                             tmpVerts[j - k * numberDivisions].y -= Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
+                            //https://de.wikipedia.org/wiki/Mehrdimensionale_Normalverteilung
+                            //--> Dichte der zweidimensionalen Normalverteilung
 
                         }
                         else
@@ -137,7 +139,7 @@ public class CreateRandomPlane : MonoBehaviour
                         }*/
                     }
                     //x direction to the left
-                    for (int j = i; j < i - 4; j--)
+                    for (int j = i; j > i - 4; j--)
                     {
                         if (delta < 0)
                         {
