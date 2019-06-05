@@ -121,6 +121,8 @@ public class CreateRandomPlane : MonoBehaviour
                 {
                     if (delta < 0)
                     {
+                        //Funktion aus wikipedia --> erste Formel oben
+                        // https://en.wikipedia.org/wiki/Normal_distribution
                         tmpVerts[j].y -= Math.Abs(delta)*((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2)))* Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x), 2) / (2 * Math.Pow(variance, 2))))));
                         tmpVerts[j + numberDivisions].y -= Math.Abs(delta)*((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) *Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x), 2) / (2 * Math.Pow(variance, 2))))));
                     } else{
