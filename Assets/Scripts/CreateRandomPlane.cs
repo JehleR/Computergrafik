@@ -10,6 +10,7 @@ public class CreateRandomPlane : MonoBehaviour
     public float maximumGenerateHeight = 10;
     public int offset = 0;
     public int scrollScale = 5;
+    public int scrollWidth = 2;
     double variance = 2;
 
     public MeshCollider meshCollider ;
@@ -41,20 +42,13 @@ public class CreateRandomPlane : MonoBehaviour
         {
             float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
             //Debug.Log("Triggered: " + scrollWheel);
-            if (Input.GetAxis("Mouse ScrollWheel") > 0f)
+            if (Input.GetAxis("Mouse ScrollWheel") > 0f || Input.GetAxis("Mouse ScrollWheel") < 0f)
             {
                 scrollWheel = Input.GetAxis("Mouse ScrollWheel");
                 //Debug.Log(Input.mousePosition);
                 //Debug.Log("Erhöhung: " + scrollWheel);
                 updateHeight(scrollWheel, index);
 
-            }
-            if (Input.GetAxis("Mouse ScrollWheel") < 0f)
-            {
-                scrollWheel = Input.GetAxis("Mouse ScrollWheel");
-                //Debug.Log(Input.mousePosition);
-                //Debug.Log("- an Höhe: " + scrollWheel);
-                updateHeight(scrollWheel, index);
             }
 
         }
@@ -105,7 +99,7 @@ public class CreateRandomPlane : MonoBehaviour
         scrollWheel *= scrollScale;
         //über die position wird noch diskutiert
         moveVertices(scrollWheel, position);
-        updateMesh(vertices);
+        updateMesh();
     }
 
     void moveVertices(float delta, int index)
@@ -115,42 +109,57 @@ public class CreateRandomPlane : MonoBehaviour
         {
             if (i == index)
             {
-                //Debug.Log(tmpVerts[i].y); //Debug.Log(delta);if ((tmpVerts[i].y += delta) < 0){tmpVerts[i].y = 0;}
-                //x direction to the right
-                for (int j = i; j < i + 4; j++)
+                for (int k = 1; k < scrollWidth; k++)
                 {
-                    if (delta < 0)
+                    //Debug.Log(tmpVerts[i].y); //Debug.Log(delta);if ((tmpVerts[i].y += delta) < 0){tmpVerts[i].y = 0;}
+                    //x direction to the right
+                    for (int j = i; j < i + 4; j++)
                     {
-                        //Funktion aus wikipedia --> erste Formel oben
-                        // https://en.wikipedia.org/wiki/Normal_distribution
-                        tmpVerts[j].y -= Math.Abs(delta)*((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2)))* Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x), 2) / (2 * Math.Pow(variance, 2))))));
-                        tmpVerts[j + numberDivisions].y -= Math.Abs(delta)*((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) *Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x), 2) / (2 * Math.Pow(variance, 2))))));
-                    } else{
-                        tmpVerts[j].y += Math.Abs(delta)* ((float)(1/(Math.Sqrt(2*Math.PI* Math.Pow(variance,2))) *Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x),2)/(2*Math.Pow(variance,2))))));
-                        tmpVerts[j + numberDivisions].y += Math.Abs(delta) *((float)(1/(Math.Sqrt(2*Math.PI* Math.Pow(variance,2)))* Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x),2)/(2*Math.Pow(variance,2))))));
-                    }
-                    if (tmpVerts[j].y< 0)
-                    {
-                        tmpVerts[j].y = 0;
-                    }
-                }
-                //x direction to the left
-                for(int j = i; j<i-4; j--)
-                {
-                    if(delta<0){
-                        tmpVerts[j].y -= Math.Abs(delta)* ((float)(1/(Math.Sqrt(2* Math.PI*Math.Pow(variance,2)))* Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x),2)/(2* Math.Pow(variance,2))))));
-                        tmpVerts[j - numberDivisions].y -= Math.Abs(delta) *((float)(1/(Math.Sqrt(2* Math.PI*Math.Pow(variance,2))) *Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x),2)/(2* Math.Pow(variance,2))))));
-                    } else{
-                        tmpVerts[j].y += Math.Abs(delta)* ((float)(1/(Math.Sqrt(2* Math.PI*Math.Pow(variance,2)))* Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x),2)/(2* Math.Pow(variance,2))))));
-                        tmpVerts[j - numberDivisions].y += Math.Abs(delta)* ((float)(1/(Math.Sqrt(2* Math.PI*Math.Pow(variance,2)))* Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x),2)/(2* Math.Pow(variance,2))))));
-                    }
-                    if(tmpVerts[j].y< 0)
-                    {
-                        tmpVerts[j].y = 0;
-                    }
-                }
-                //tmpVerts[i].y = tmpVerts[i].y*2;
+                        if (delta < 0)
+                        {
+                            //Funktion aus wikipedia --> erste Formel oben
+                            // https://en.wikipedia.org/wiki/Normal_distribution
+                            tmpVerts[j].y -= Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
+                            tmpVerts[j +k* numberDivisions].y -= Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
+                            tmpVerts[j - k * numberDivisions].y -= Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
 
+                        }
+                        else
+                        {
+                            tmpVerts[j].y += Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
+                            tmpVerts[j +k* numberDivisions].y += Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
+                            tmpVerts[j - k * numberDivisions].y += Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
+
+                        }
+                        /*if (tmpVerts[j].y < 0)
+                        {
+                            tmpVerts[j].y = 0;
+                        }*/
+                    }
+                    //x direction to the left
+                    for (int j = i; j < i - 4; j--)
+                    {
+                        if (delta < 0)
+                        {
+                            tmpVerts[j].y -= Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
+                            tmpVerts[j -k* numberDivisions].y -= Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
+                            tmpVerts[j + k * numberDivisions].y -= Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
+
+                        }
+                        else
+                        {
+                            tmpVerts[j].y += Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow((tmpVerts[j].x), 2) / (2 * Math.Pow(variance, 2))))));
+                            tmpVerts[j - k*numberDivisions].y += Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
+                            tmpVerts[j + k * numberDivisions].y += Math.Abs(delta) * ((float)(1 / (Math.Sqrt(2 * Math.PI * Math.Pow(variance, 2))) * Math.Pow(Math.E, -(Math.Pow(0, 2) / (2 * Math.Pow(variance, 2))))));
+
+                        }
+                        /*if (tmpVerts[j].y < 0)
+                        {
+                            tmpVerts[j].y = 0;
+                        }*/
+                    }
+                    //tmpVerts[i].y = tmpVerts[i].y*2;
+                }
             }
         }
         vertices = tmpVerts;
@@ -227,12 +236,12 @@ public class CreateRandomPlane : MonoBehaviour
 
         }
 
-        removeNegativeValues(vertices);
-        updateMesh(vertices);
+        updateMesh();
     }
 
-    void updateMesh(Vector3[] vertices)
+    void updateMesh()
     {
+        removeNegativeValues();
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = trianglesForPlane;
@@ -262,7 +271,7 @@ public class CreateRandomPlane : MonoBehaviour
 
 
     }
-    void removeNegativeValues(Vector3[] vertices)
+    void removeNegativeValues()
     {
         for (int i = 0; i < vertices.Length; i++)
         {
