@@ -9,6 +9,8 @@ public class CreateRandomPlane : MonoBehaviour
     public float maximumGenerateHeight = 10;
     public int offset = 0;
 
+    public MeshCollider meshCollider ;
+
     // https://docs.unity3d.com/ScriptReference/Mesh.html 
     //necessary for mesh
     Vector3[] vertices;
@@ -16,16 +18,22 @@ public class CreateRandomPlane : MonoBehaviour
     Vector2[] uv;
     int[] trianglesForPlane;
     Mesh mesh;
+    int index;
 
     // Start is called before the first frame update
     void Start()
     {
+        meshCollider = gameObject.GetComponent<MeshCollider>();
         createRandomPlane();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetMouseButtonDown(0))
+        {
+            index = getClickedVertex(Input.mousePosition);
+        }
         if (Input.GetMouseButton(0))
         {
             float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
@@ -34,8 +42,8 @@ public class CreateRandomPlane : MonoBehaviour
             {
                 scrollWheel = Input.GetAxis("Mouse ScrollWheel");
                 //Debug.Log(Input.mousePosition);
-                //Debug.Log("+ an Höhe: " + scrollWheel);
-                updateHeight(scrollWheel, Input.mousePosition);
+                Debug.Log("Erhöhung: " + scrollWheel);
+                updateHeight(scrollWheel, index);
 
             }
             if (Input.GetAxis("Mouse ScrollWheel") < 0f)
@@ -43,23 +51,63 @@ public class CreateRandomPlane : MonoBehaviour
                 scrollWheel = Input.GetAxis("Mouse ScrollWheel");
                 //Debug.Log(Input.mousePosition);
                 //Debug.Log("- an Höhe: " + scrollWheel);
-                updateHeight(scrollWheel, Input.mousePosition);
+                updateHeight(scrollWheel, index);
             }
 
         }
     }
 
-    void updateHeight(float scrollWheel, Vector3 position)
+    int getClickedVertex(Vector3 position)
+    {
+        //Debug.Log("Postiton: "+position);
+        //Debug.Log("Camera: "+Camera.main);
+        Ray ray = Camera.main.ScreenPointToRay(position);
+        RaycastHit hit;
+        Vector3 clickpos, lastClick;
+        int indexActiveVert = 0;
+        //Debug.Log("Look if hit");
+        //Debug.Log(meshCollider.Raycast(ray, out hit, Mathf.Infinity));
+        if (meshCollider.Raycast(ray, out hit, Mathf.Infinity))
+        {
+            Debug.Log("hit mesh");
+            clickpos = hit.point;
+            //Debug.Log(clickpos);
+            lastClick = clickpos;
+            Vector3 nearestVertex = Vector3.zero;
+            Vector3 activeVert = Vector3.zero;
+            int index = 0;
+            float minDistanceSqr = Mathf.Infinity;
+
+            foreach (Vector3 vertex in mesh.vertices)
+            {
+                Vector3 diff = lastClick - vertex;
+                float distSqr = diff.sqrMagnitude;
+                if (distSqr < minDistanceSqr)
+                {
+                    indexActiveVert = index;
+                    minDistanceSqr = distSqr;
+                    nearestVertex = vertex;
+                }
+                index++;
+            }
+            activeVert = nearestVertex;
+        }
+        return indexActiveVert;
+
+    }
+
+    void updateHeight(float scrollWheel, int position)
     {
         int scale = 5;
         //über die position wird noch diskutiert
-        vertices[(int)position[0]].y += scrollWheel * scale;
-        if (vertices[(int)position[0]].y < 0)
+        vertices[position].y += scrollWheel * scale;
+        if (vertices[position].y < 0)
         {
-            vertices[(int)position[0]].y = 0;
+            vertices[position].y = 0;
         }
         updateMesh(vertices);
     }
+
 
     void createRandomPlane()
     {
@@ -143,6 +191,8 @@ public class CreateRandomPlane : MonoBehaviour
 
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
+        meshCollider.sharedMesh = mesh;
+
     }
 
     void DiamondSquareAlgorithm(int row, int col, int size, float offset)
