@@ -469,10 +469,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberDivisions: 256
-  sizeOfGerneratedPlane: 60
+  sizeOfGerneratedPlane: 100
   triangleHeightDiff: 10
   offsetMap: 0
-  variance: 20
   meshCollider: {fileID: 0}
 --- !u!23 &773758890
 MeshRenderer:
