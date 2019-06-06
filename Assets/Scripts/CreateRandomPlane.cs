@@ -7,11 +7,11 @@ public class CreateRandomPlane : MonoBehaviour
 {
     public int numberDivisions = 128;
     public float sizeOfGerneratedPlane = 30;
-    public float generateHeightDiff = 10;
-    public int offset = 0;
-    int scrollScale = 20;
+    public float triangleHeightDiff = 10;
+    public int offsetMap = 0;
+    int scrollScale = 100;
     int scrollWidth;
-    public double variance = 10;
+    double variance = 10;
 
     public MeshCollider meshCollider ;
 
@@ -27,7 +27,6 @@ public class CreateRandomPlane : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
         meshCollider = gameObject.GetComponent<MeshCollider>();
         createRandomPlane();
     }
@@ -35,7 +34,7 @@ public class CreateRandomPlane : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        scrollWidth = Convert.ToInt32(variance*0.25);
+        scrollWidth = Convert.ToInt32(variance*0.3f);
         if (Input.GetMouseButtonDown(0))
         {
             index = getClickedVertex(Input.mousePosition);
@@ -44,9 +43,9 @@ public class CreateRandomPlane : MonoBehaviour
         {
             float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
             //Debug.Log("Triggered: " + scrollWheel);
-            if (Input.GetAxis("Mouse ScrollWheel") > 0f || Input.GetAxis("Mouse ScrollWheel") < 0f)
+            if (scrollWheel > 0f || scrollWheel < 0f)
             {
-                scrollWheel = Input.GetAxis("Mouse ScrollWheel");
+                //scrollWheel = Input.GetAxis("Mouse ScrollWheel");
                 //Debug.Log(Input.mousePosition);
                 //Debug.Log("Erhöhung: " + scrollWheel);
                 updateHeight(scrollWheel, index);
@@ -141,10 +140,6 @@ public class CreateRandomPlane : MonoBehaviour
                             tmpVerts[j + k * numberDivisions+k].y += Math.Abs(delta)*((float) ((1 / (2 * Math.PI * variance * variance * Math.Sqrt(1))) * Math.Exp(-(1 / 2)*((Math.Pow(tmpVerts[j + k * numberDivisions].x, 2) / Math.Pow(variance, 2)) + (Math.Pow(tmpVerts[j + k * numberDivisions].z, 2) / Math.Pow(variance, 2))))));
 
                         }
-                        /*if (tmpVerts[j].y < 0)
-                        {
-                            tmpVerts[j].y = 0;
-                        }*/
                     }
                     //x direction to the left
                     for (int j = i; j > i - scrollWidth; j--)
@@ -169,10 +164,6 @@ public class CreateRandomPlane : MonoBehaviour
                             tmpVerts[j + k * numberDivisions + k].y += Math.Abs(delta)*((float) ((1 / (2 * Math.PI * variance * variance * Math.Sqrt(1))) * Math.Exp(-(1 / 2) * ((Math.Pow(tmpVerts[j + k * numberDivisions].x, 2) / Math.Pow(variance, 2)) + (Math.Pow(tmpVerts[j + k * numberDivisions].z, 2) / Math.Pow(variance, 2))))));
 
                         }
-                        /*if (tmpVerts[j].y < 0)
-                        {
-                            tmpVerts[j].y = 0;
-                        }*/
                     }
                 }
             }
@@ -222,15 +213,15 @@ public class CreateRandomPlane : MonoBehaviour
             }
         }
 
-        vertices[0].y = UnityEngine.Random.Range(-generateHeightDiff, generateHeightDiff) + offset;
-        vertices[numberDivisions].y = UnityEngine.Random.Range(-generateHeightDiff, generateHeightDiff) + offset;
-        vertices[vertices.Length - 1].y = UnityEngine.Random.Range(-generateHeightDiff, generateHeightDiff) + offset;
-        vertices[vertices.Length - 1 - numberDivisions].y = UnityEngine.Random.Range(-generateHeightDiff, generateHeightDiff) + offset;
+        vertices[0].y = UnityEngine.Random.Range(-triangleHeightDiff, triangleHeightDiff) + offsetMap;
+        vertices[numberDivisions].y = UnityEngine.Random.Range(-triangleHeightDiff, triangleHeightDiff) + offsetMap;
+        vertices[vertices.Length - 1].y = UnityEngine.Random.Range(-triangleHeightDiff, triangleHeightDiff) + offsetMap;
+        vertices[vertices.Length - 1 - numberDivisions].y = UnityEngine.Random.Range(-triangleHeightDiff, triangleHeightDiff) + offsetMap;
 
         int iterations = (int)Mathf.Log(numberDivisions, 2);
         int numSquares = 1;
         int squareSize = numberDivisions;
-        float tmpMaximumGenerateHeight = generateHeightDiff;
+        float tmpMaximumGenerateHeight = triangleHeightDiff;
         for (int i = 0; i < iterations; i++)
         {
             int row = 0;
@@ -250,7 +241,6 @@ public class CreateRandomPlane : MonoBehaviour
             tmpMaximumGenerateHeight *= 0.5f;
 
         }
-
         updateMesh();
     }
 
@@ -264,7 +254,6 @@ public class CreateRandomPlane : MonoBehaviour
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
         meshCollider.sharedMesh = mesh;
-
     }
 
     void DiamondSquareAlgorithm(int row, int col, int size, float offset)
@@ -272,10 +261,7 @@ public class CreateRandomPlane : MonoBehaviour
         int halfSquareSize = (int)(size * 0.5f);
         int pointLeftTop = row * (numberDivisions + 1) + col;
         int pointLeftBottom = (row + size) * (numberDivisions + 1) + col;
-        //verursacht keine negativen Werte aber auch keine 0 Werte
-        //pointLeftTop = removeNegativeValues(pointLeftTop);
-        //pointLeftBottom = removeNegativeValues(pointLeftBottom);
-
+        
         int middle = (int)(row + halfSquareSize) * (numberDivisions + 1) + (int)(col + halfSquareSize);
         vertices[middle].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y + vertices[pointLeftBottom].y + vertices[pointLeftBottom + size].y) * 0.25f + UnityEngine.Random.Range(-offset, offset);
 

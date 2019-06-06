@@ -468,11 +468,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36d87ec821ca85c4ebf3d76ea96a40e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberDivisions: 128
-  sizeOfGerneratedPlane: 45
-  maximumGenerateHeight: 10
-  offset: 0
-  variance: 10
+  numberDivisions: 256
+  sizeOfGerneratedPlane: 60
+  triangleHeightDiff: 10
+  offsetMap: 0
+  variance: 20
   meshCollider: {fileID: 0}
 --- !u!23 &773758890
 MeshRenderer:
