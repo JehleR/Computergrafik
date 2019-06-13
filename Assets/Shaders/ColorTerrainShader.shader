@@ -27,6 +27,9 @@ Shader "Unlit/ColorTerrainShader"
 		_ScrollSpeedY("Speed Y", Range(0, 1)) = 0.3
 
 		_WaterColor("Water Color", Color) = (123, 108, 221, 255)
+			
+		// https://gist.github.com/smkplus/2a5899bf415e2b6bf6a59726bb1ae2ec
+		[Enum(None, 0, Vertical, 1, Horizontal, 2)] _UseContourLines("Show contour lines", Float) = 0
 	}
 
 	SubShader
@@ -96,6 +99,7 @@ Shader "Unlit/ColorTerrainShader"
 			float _ScrollSpeedX;
 			float _ScrollSpeedY;
 			float4 _WaterColor;
+			float _UseContourLines;
 
 			// VERTEX SHADER
 			v2f vert(appdata_full vertexIn)
@@ -160,9 +164,6 @@ Shader "Unlit/ColorTerrainShader"
 					worldNormal = UnityObjectToWorldNormal(fragIn.normal);
 				}
 
-				float contourLineFatness = 0.03;
-				float contourInterval = 1;
-
 				float4 amb = float4(ShadeSH9(half4(worldNormal, 1)), 1);
 
 				half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
@@ -178,8 +179,15 @@ Shader "Unlit/ColorTerrainShader"
 					color = _WaterColor;
 					color *= (_Ka * amb + _Kd * diff);
 					color += _Ks * spec;
-				} else if (fragIn.worldPos.y % contourInterval < contourLineFatness && fragIn.worldPos.y > contourLineFatness) {
-					color.rgb = float3(0.545, 0.271, 0.075);
+				}
+
+				// set contour lines which have the equal height
+				if (_UseContourLines == 1) {
+					float contourLineFatness = 0.03;
+					float contourInterval = 1;
+					if (fragIn.worldPos.y > 0 && fragIn.worldPos.y % contourInterval < contourLineFatness && fragIn.worldPos.y > contourLineFatness) {
+						color.rgb = float3(0.545, 0.271, 0.075);
+					}
 				}
 
 				// multiply base color with ambient and diffuse light
