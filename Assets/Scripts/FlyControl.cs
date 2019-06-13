@@ -8,7 +8,6 @@ public class FlyControl : MonoBehaviour
     float speed;
     float width;
     float height;
-    bool RotateValue;
     float alpha;
     // Start is called before the first frame update
     void Start()
@@ -16,7 +15,6 @@ public class FlyControl : MonoBehaviour
         speed = 0.3f;
         width = 400;
         height = 400;
-        RotateValue = true;
         alpha = 0;
     }
 
