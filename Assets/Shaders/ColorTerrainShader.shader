@@ -76,18 +76,18 @@ Shader "Unlit/ColorTerrainShader"
 				float4 spec : COLOR3;
 
 				// Weitergabe der Textur Koordinaten
-				float2 uv : TEXCOORD5;
+				float2 uv : TEXCOORD1;
 
 				float4 localVertex : COLOR4;
-				half3 worldViewDir : TEXCOORD1;
+				half3 worldViewDir : TEXCOORD2;
 
-				half3 normal : TEXCOORD6;
+				half3 normal : TEXCOORD3;
 
 				// these three vectors will hold a 3x3 rotation matrix
 				// that transforms from tangent to world space
-				half3 tspace0 : TEXCOORD2;
-				half3 tspace1 : TEXCOORD3;
-				half3 tspace2  : TEXCOORD4;
+				half3 tspace0 : TEXCOORD4;
+				half3 tspace1 : TEXCOORD5;
+				half3 tspace2  : TEXCOORD6;
 			};
 
 			fixed4 _Color;
