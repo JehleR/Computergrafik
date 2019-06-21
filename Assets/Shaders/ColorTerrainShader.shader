@@ -4,36 +4,35 @@ Shader "Unlit/ColorTerrainShader"
 {
 	Properties
 	{
+		// Lighting
 		// Reflectance of the ambient light
 		_Ka("Ambient Reflectance", Range(0, 1)) = 0.5
-
 		// Reflectance of the diffuse light
 		_Kd("Diffuse Reflectance", Range(0, 1)) = 0.5
-
 		// Spekulare Reflektanz
 		_Ks("Specular Reflectance", Range(0, 1)) = 0.5
-
 		// Shininess
 		_Shininess("Shininess", Range(0.1, 1000)) = 100
 
+
+		// Land & contour lines
 		// Colormap
 		_ColorTex("Color Texture", 2D) = "white" {}
+		// create checkbox for enabling contour lines
+		// https://gist.github.com/smkplus/2a5899bf415e2b6bf6a59726bb1ae2ec
+		[Enum(None, 0, Vertical, 1, Horizontal, 2)] _UseContourLines("Show contour lines", Float) = 0
 
+
+		// Water
 		// Bump Map 1 for water
 		_BumpMap("Water Map", 2D) = "bump" {}
-
 		//Bump Map 2 for water
-		_BumpMap2("Water Map2", 2D) = "bump" {}
-
+		_BumpMap2("Water Map 2", 2D) = "bump" {}
+		// Water Color
+		_WaterColor("Water Color", Color) = (123, 108, 221, 255)
 		// Speed of Water Simulation
 		_ScrollSpeedX("Speed X", Range(0, 1)) = 0.1
 		_ScrollSpeedY("Speed Y", Range(0, 1)) = 0.3
-
-		// Water Color
-		_WaterColor("Water Color", Color) = (123, 108, 221, 255)
-
-		// https://gist.github.com/smkplus/2a5899bf415e2b6bf6a59726bb1ae2ec
-		[Enum(None, 0, Vertical, 1, Horizontal, 2)] _UseContourLines("Show contour lines", Float) = 0
 	}
 
 	SubShader
@@ -57,14 +56,6 @@ Shader "Unlit/ColorTerrainShader"
 			#include "UnityCG.cginc"
 			#include "Lighting.cginc" // for lightning
 
-			// input struct of vertex shader
-			/*struct appdata
-			{
-				float4 vertex : POSITION;
-				float4 color : COLOR;
-				float3 normal : NORMAL;
-			};*/
-
 			// struct for data from vertex to fragment shader
 			struct v2f
 			{
@@ -72,17 +63,9 @@ Shader "Unlit/ColorTerrainShader"
 				float4 pos : SV_POSITION;
 				// global vertex POSITION
 				float3 worldPos : TEXCOORD0;
-				// ambient light color
-				float4 amb : COLOR1;
-				// diffuse light color
-				float4 diff : COLOR2;
-				// Spekulare Licht Farbe
-				float4 spec : COLOR3;
 
 				// Weitergabe der Textur Koordinaten
 				float2 uv : TEXCOORD1;
-
-				float4 localVertex : COLOR4;
 				half3 worldViewDir : TEXCOORD2;
 
 				half3 normal : TEXCOORD3;
@@ -94,123 +77,121 @@ Shader "Unlit/ColorTerrainShader"
 				half3 tspace2  : TEXCOORD6;
 			};
 
-		fixed4 _Color;
-		float _Ka, _Kd, _Ks;
-		sampler2D _ColorTex;
-		sampler2D _BumpMap;
-		sampler2D _BumpMap2;
-		float _Shininess;
-		float _ScrollSpeedX;
-		float _ScrollSpeedY;
-		float4 _WaterColor;
-		float _UseContourLines;
+			fixed4 _Color;
+			float _Ka, _Kd, _Ks;
+			sampler2D _ColorTex;
+			sampler2D _BumpMap;
+			sampler2D _BumpMap2;
+			float _Shininess;
+			float _ScrollSpeedX;
+			float _ScrollSpeedY;
+			float4 _WaterColor;
+			float _UseContourLines;
 
-		// VERTEX SHADER
-		v2f vert(appdata_full vertexIn)
-		{
-			v2f vertexOut;
+			// VERTEX SHADER
+			v2f vert(appdata_full vertexIn)
+			{
+				v2f vertexOut;
 
-			vertexOut.localVertex = vertexIn.vertex;
+				// transform vertices from object coordinates to clip coordinates
+				vertexOut.pos = UnityObjectToClipPos(vertexIn.vertex);
 
-			// transform vertices from object coordinates to clip coordinates
-			vertexOut.pos = UnityObjectToClipPos(vertexIn.vertex);
+				// calculate and normalize space vertex position towards the camera.
+				vertexOut.worldViewDir = normalize(WorldSpaceViewDir(vertexIn.vertex));
 
-			// calculate and normalize space vertex position towards the camera.
-			vertexOut.worldViewDir = normalize(WorldSpaceViewDir(vertexIn.vertex));
+				// Get world position of vertex
+				vertexOut.worldPos = mul(unity_ObjectToWorld, vertexIn.vertex);
 
-			// Get world position of vertex
-			vertexOut.worldPos = mul(unity_ObjectToWorld, vertexIn.vertex);
+				// rotate with transform matrix
+				half3 wTangent = UnityObjectToWorldDir(vertexIn.tangent);
 
-			// rotate with transform matrix
-			half3 wTangent = UnityObjectToWorldDir(vertexIn.tangent);
-
-			// transform normal vectors to world coordinates
-			half3 worldNormal = UnityObjectToWorldNormal(vertexIn.normal);
-
-			// compute bitangent from cross product of normal and tangent
-			// bitanget vector is needed to convert the normal from the normal map into world space
-			half tangentSign = vertexIn.tangent.w * unity_WorldTransformParams.w;
-			half3 wBitangent = cross(worldNormal, wTangent) * tangentSign;
-
-			// output the tangent space matrix
-			vertexOut.tspace0 = half3(wTangent.x, wBitangent.x, worldNormal.x);
-			vertexOut.tspace1 = half3(wTangent.y, wBitangent.y, worldNormal.y);
-			vertexOut.tspace2 = half3(wTangent.z, wBitangent.z, worldNormal.z);
-
-			vertexOut.uv = vertexIn.texcoord;
-			vertexOut.normal = vertexIn.normal;
-
-			return vertexOut;
-		}
-
-		// FRAGMENT SHADER
-		float4 frag(v2f fragIn) : SV_Target{
-			// set color based on height
-			float4 color = fragIn.worldPos.y <= 10 ? tex2Dlod(_ColorTex, float4(0, fragIn.worldPos.y / 10, 0, 0)) : tex2Dlod(_ColorTex, float4(0, 0.99, 0, 0));
-
-			// Calc xOffset and yOffset for Water Simulation
-			float xOffset = _ScrollSpeedX * _Time;
-			float yOffset = _ScrollSpeedY * _Time;
-
-			// sample the normal map, and decode from the Unity encoding
-			half3 tnormal = UnpackNormal(tex2D(_BumpMap, fragIn.uv + float2(xOffset, yOffset * 0.5)));
-			half3 tnormal2 = UnpackNormal(tex2D(_BumpMap2, fragIn.uv + float2(xOffset , yOffset)));
-
-			// add both normal maps
-			tnormal = (tnormal + tnormal2) / 2;
-
-			// transform normal from tangent to world space
-			half3 worldNormal;
-			if (fragIn.worldPos.y <= 0) {
-				worldNormal.x = dot(fragIn.tspace0, tnormal);
-				worldNormal.y = dot(fragIn.tspace1, tnormal);
-				worldNormal.z = dot(fragIn.tspace2, tnormal);
-			}
-			else {
 				// transform normal vectors to world coordinates
-				worldNormal = UnityObjectToWorldNormal(fragIn.normal);
+				half3 worldNormal = UnityObjectToWorldNormal(vertexIn.normal);
+
+				// compute bitangent from cross product of normal and tangent
+				// bitanget vector is needed to convert the normal from the normal map into world space
+				half tangentSign = vertexIn.tangent.w * unity_WorldTransformParams.w;
+				half3 wBitangent = cross(worldNormal, wTangent) * tangentSign;
+
+				// output the tangent space matrix
+				vertexOut.tspace0 = half3(wTangent.x, wBitangent.x, worldNormal.x);
+				vertexOut.tspace1 = half3(wTangent.y, wBitangent.y, worldNormal.y);
+				vertexOut.tspace2 = half3(wTangent.z, wBitangent.z, worldNormal.z);
+
+				vertexOut.uv = vertexIn.texcoord;
+				vertexOut.normal = vertexIn.normal;
+
+				return vertexOut;
 			}
 
-			// calculate ambient light color
-			float4 amb = float4(ShadeSH9(half4(worldNormal, 1)), 1);
+			// FRAGMENT SHADER
+			float4 frag(v2f fragIn) : SV_Target {
+				// set color based on height
+				float4 color = fragIn.worldPos.y < 10 ? tex2Dlod(_ColorTex, float4(0, fragIn.worldPos.y / 10, 0, 0)) : tex2Dlod(_ColorTex, float4(0, 0.99, 0, 0));
 
-			// get diffuse Light
-			half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
+				// Calc xOffset and yOffset for Water Simulation
+				float xOffset = _ScrollSpeedX * _Time;
+				float yOffset = _ScrollSpeedY * _Time;
 
-			// Diffuse component multiplied by light colour
-			float4 diff = nl * _LightColor0;
+				// sample the normal map, and decode from the Unity encoding
+				half3 tnormal = UnpackNormal(tex2D(_BumpMap, fragIn.uv + float2(xOffset, yOffset * 0.5)));
+				half3 tnormal2 = UnpackNormal(tex2D(_BumpMap2, fragIn.uv + float2(xOffset , yOffset)));
 
-			// get reflected light
-			float3 worldSpaceReflection = reflect(normalize(-_WorldSpaceLightPos0.xyz), worldNormal);
+				// add both normal maps
+				tnormal = (tnormal + tnormal2) / 2;
 
-			// claculate specular light
-			half re = pow(max(dot(worldSpaceReflection, fragIn.worldViewDir), 0), _Shininess);
-			float4 spec = re * _LightColor0;
-
-			if (fragIn.worldPos.y <= 0) {
-				color = _WaterColor;
-				color *= (_Ka * amb + _Kd * diff);
-				// add specular light
-				color += _Ks * spec;
-			}
-
-			// set contour lines which have the equal height
-			if (_UseContourLines == 1) {
-				float contourLineFatness = 0.03;
-				float contourInterval = 1;
-				if (fragIn.worldPos.y > 0 && fragIn.worldPos.y % contourInterval < contourLineFatness && fragIn.worldPos.y > contourLineFatness) {
-					color.rgb = float3(0.545, 0.271, 0.075);
+				// transform normal from tangent to world space
+				half3 worldNormal;
+				if (fragIn.worldPos.y <= 0) {
+					worldNormal.x = dot(fragIn.tspace0, tnormal);
+					worldNormal.y = dot(fragIn.tspace1, tnormal);
+					worldNormal.z = dot(fragIn.tspace2, tnormal);
 				}
+				else {
+					// transform normal vectors to world coordinates
+					worldNormal = UnityObjectToWorldNormal(fragIn.normal);
+				}
+
+				// calculate ambient light color
+				float4 amb = float4(ShadeSH9(half4(worldNormal, 1)), 1);
+
+				// get diffuse Light
+				half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
+
+				// Diffuse component multiplied by light colour
+				float4 diff = nl * _LightColor0;
+
+				// get reflected light
+				float3 worldSpaceReflection = reflect(normalize(-_WorldSpaceLightPos0.xyz), worldNormal);
+
+				// claculate specular light
+				half re = pow(max(dot(worldSpaceReflection, fragIn.worldViewDir), 0), _Shininess);
+				float4 spec = re * _LightColor0;
+
+				if (fragIn.worldPos.y <= 0) {
+					color = _WaterColor;
+					color *= (_Ka * amb + _Kd * diff);
+					// add specular light
+					color += _Ks * spec;
+				}
+
+				// set contour lines which have the equal height
+				if (_UseContourLines == 1) {
+					float contourLineFatness = 0.03;
+					float contourInterval = 1;
+					if (fragIn.worldPos.y > 0 && fragIn.worldPos.y % contourInterval < contourLineFatness && fragIn.worldPos.y > contourLineFatness) {
+						color.rgb = float3(0.545, 0.271, 0.075);
+					}
+				}
+
+				// multiply base color with ambient and diffuse light
+				color *= (_Ka * amb + _Kd * diff);
+
+				//clamps the value so that it is never larger than 1.0 and never smaller than 0.0
+				return saturate(color);
 			}
 
-			// multiply base color with ambient and diffuse light
-			color *= (_Ka * amb + _Kd * diff);
-
-			//clamps the value so that it is never larger than 1.0 and never smaller than 0.0
-			return saturate(color);
+			ENDCG
 		}
-
-		ENDCG
 	}
-		}
 }
