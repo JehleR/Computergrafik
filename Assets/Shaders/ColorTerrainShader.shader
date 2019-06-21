@@ -21,6 +21,12 @@ Shader "Unlit/ColorTerrainShader"
 		// create checkbox for enabling contour lines
 		// https://gist.github.com/smkplus/2a5899bf415e2b6bf6a59726bb1ae2ec
 		[Enum(None, 0, Vertical, 1, Horizontal, 2)] _UseContourLines("Show contour lines", Float) = 0
+		// Contour lines intervall
+		_ContourLinesIntervall("Contour Lines Intervall", Range(0, 10)) = 1
+		// Contour Lines Fatness
+		_ContourLinesFatness("Contour Lines Fatness", Range(0, 1)) = 0.03
+		// Contour Lines color
+		_ContourLinesColor("Contour Lines Color", Color) = (96, 46, 10, 1)
 
 
 		// Water
@@ -87,6 +93,9 @@ Shader "Unlit/ColorTerrainShader"
 			float _ScrollSpeedY;
 			float4 _WaterColor;
 			float _UseContourLines;
+			float _ContourLinesIntervall;
+			float _ContourLinesFatness;
+			float4 _ContourLinesColor;
 
 			// VERTEX SHADER
 			v2f vert(appdata_full vertexIn)
@@ -126,30 +135,31 @@ Shader "Unlit/ColorTerrainShader"
 
 			// FRAGMENT SHADER
 			float4 frag(v2f fragIn) : SV_Target {
-				// set color based on height
-				float4 color = fragIn.worldPos.y < 10 ? tex2Dlod(_ColorTex, float4(0, fragIn.worldPos.y / 10, 0, 0)) : tex2Dlod(_ColorTex, float4(0, 0.99, 0, 0));
-
-				// Calc xOffset and yOffset for Water Simulation
-				float xOffset = _ScrollSpeedX * _Time;
-				float yOffset = _ScrollSpeedY * _Time;
-
-				// sample the normal map, and decode from the Unity encoding
-				half3 tnormal = UnpackNormal(tex2D(_BumpMap, fragIn.uv + float2(xOffset, yOffset * 0.5)));
-				half3 tnormal2 = UnpackNormal(tex2D(_BumpMap2, fragIn.uv + float2(xOffset , yOffset)));
-
-				// add both normal maps
-				tnormal = (tnormal + tnormal2) / 2;
-
-				// transform normal from tangent to world space
+				float4 color;
 				half3 worldNormal;
-				if (fragIn.worldPos.y <= 0) {
+				if (fragIn.worldPos.y > 0) {
+					// set color based on height
+					color = fragIn.worldPos.y < 10 ? tex2Dlod(_ColorTex, float4(0, fragIn.worldPos.y / 10, 0, 0)) : tex2Dlod(_ColorTex, float4(0, 0.99, 0, 0));
+					// transform normal vectors to world coordinates
+					worldNormal = UnityObjectToWorldNormal(fragIn.normal);
+				}
+				else {
+					color = _WaterColor;
+					// Calc xOffset and yOffset for Water Simulation
+					float xOffset = _ScrollSpeedX * _Time;
+					float yOffset = _ScrollSpeedY * _Time;
+
+					// sample the normal map, and decode from the Unity encoding
+					half3 tnormal = UnpackNormal(tex2D(_BumpMap, fragIn.uv + float2(xOffset, yOffset * 0.5)));
+					half3 tnormal2 = UnpackNormal(tex2D(_BumpMap2, fragIn.uv + float2(xOffset, yOffset)));
+
+					// add both normal maps
+					tnormal = (tnormal + tnormal2) / 2;
+
+					// transform normal from tangent to world space
 					worldNormal.x = dot(fragIn.tspace0, tnormal);
 					worldNormal.y = dot(fragIn.tspace1, tnormal);
 					worldNormal.z = dot(fragIn.tspace2, tnormal);
-				}
-				else {
-					// transform normal vectors to world coordinates
-					worldNormal = UnityObjectToWorldNormal(fragIn.normal);
 				}
 
 				// calculate ambient light color
@@ -168,24 +178,20 @@ Shader "Unlit/ColorTerrainShader"
 				half re = pow(max(dot(worldSpaceReflection, fragIn.worldViewDir), 0), _Shininess);
 				float4 spec = re * _LightColor0;
 
+				// set lighting
+				// multiply base color with ambient and diffuse light
+				color *= (_Ka * amb + _Kd * diff);
 				if (fragIn.worldPos.y <= 0) {
-					color = _WaterColor;
-					color *= (_Ka * amb + _Kd * diff);
 					// add specular light
 					color += _Ks * spec;
 				}
 
-				// set contour lines which have the equal height
+				// set contour lines
 				if (_UseContourLines == 1) {
-					float contourLineFatness = 0.03;
-					float contourInterval = 1;
-					if (fragIn.worldPos.y > 0 && fragIn.worldPos.y % contourInterval < contourLineFatness && fragIn.worldPos.y > contourLineFatness) {
-						color.rgb = float3(0.545, 0.271, 0.075);
+					if (fragIn.worldPos.y > 0 && fragIn.worldPos.y % _ContourLinesIntervall < _ContourLinesFatness) {
+						color = _ContourLinesColor;
 					}
 				}
-
-				// multiply base color with ambient and diffuse light
-				color *= (_Ka * amb + _Kd * diff);
 
 				//clamps the value so that it is never larger than 1.0 and never smaller than 0.0
 				return saturate(color);
