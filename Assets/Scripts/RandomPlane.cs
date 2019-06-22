@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class CreateRandomPlane : MonoBehaviour
+public class RandomPlane : MonoBehaviour
 {
     public int numberDivisions = 128;
     private float sizeOfGerneratedPlane = 20;

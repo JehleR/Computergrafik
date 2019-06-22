@@ -2771,11 +2771,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberDivisions: 256
+  sizeOfGerneratedPlane: 20
   triangleHeightDiff: 5
   offsetHeight: 0
   manipulationSpeed: 5
   vulcanization: 0
   vulcanRadius: 5
+  meshCollider: {fileID: 0}
+  offset: {x: 0, y: 0, z: 0}
 --- !u!23 &773758890
 MeshRenderer:
   m_ObjectHideFlags: 0
