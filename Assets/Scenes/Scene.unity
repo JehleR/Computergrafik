@@ -929,6 +929,7 @@ MonoBehaviour:
   maxY: 90
   xRot: 0
   yRot: 0
+  plane: {fileID: 773758886}
 --- !u!82 &170864479
 AudioSource:
   m_ObjectHideFlags: 0

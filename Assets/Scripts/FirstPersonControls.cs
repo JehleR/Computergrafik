@@ -8,6 +8,9 @@ public class FirstPersonControls : MonoBehaviour {
     public float movementSpeed = 1F;
     public float rotationSpeed = 10F;
 
+    // Access to Plane (GameObject) and its Material
+    public GameObject plane;
+
     // Max Rotation Values
     public float minX = -360F, maxX = 360F, minY = -90, maxY = 90;
     public float xRot = 0, yRot = 0;
@@ -18,6 +21,7 @@ public class FirstPersonControls : MonoBehaviour {
     private GameObject physicalParent;
     private Rigidbody physicalParentBody;
     private AudioSource audioSource;
+    private Renderer planeRenderer;
 
     // Use this for initialization
     void Start() {
@@ -48,6 +52,9 @@ public class FirstPersonControls : MonoBehaviour {
 
         // get audio source
         audioSource = GetComponent<AudioSource>();
+
+        // get plane Renderer to access Shader variables
+        planeRenderer = plane.GetComponent<Renderer>();
     }
 
     // Update is called once per frame
@@ -130,6 +137,13 @@ public class FirstPersonControls : MonoBehaviour {
         {
             // toggle music
             audioSource.mute = !audioSource.mute;
+        }
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            // toggle contour lines
+            var contourLines = planeRenderer.material.GetFloat("_UseContourLines");
+            contourLines = contourLines > 0 ? 0 : 1;
+            plane.GetComponent<Renderer>().material.SetFloat("_UseContourLines", contourLines);
         }
     }
 

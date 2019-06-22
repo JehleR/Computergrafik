@@ -20,7 +20,7 @@ Shader "Unlit/ColorTerrainShader"
 		_ColorTex("Color Texture", 2D) = "white" {}
 		// create checkbox for enabling contour lines
 		// https://gist.github.com/smkplus/2a5899bf415e2b6bf6a59726bb1ae2ec
-		[Enum(None, 0, Vertical, 1, Horizontal, 2)] 
+		[Toggle] 
 		_UseContourLines("Show contour lines", Float) = 0
 		// Contour lines intervall
 		_ContourLinesIntervall("Contour Lines Intervall", Range(0, 10)) = 1
@@ -194,7 +194,7 @@ Shader "Unlit/ColorTerrainShader"
 				}
 
 				// set contour lines
-				if (_UseContourLines == 1) {
+				if (_UseContourLines > 0) {
 					if (fragIn.worldPos.y > _ContourLinesFatness && 
 						fragIn.worldPos.y % _ContourLinesIntervall < _ContourLinesFatness) {
 						color = _ContourLinesColor;
