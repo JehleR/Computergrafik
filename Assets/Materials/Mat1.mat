@@ -69,24 +69,24 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
-    - _ContourLinesFatness: 0.031
-    - _ContourLinesIntervall: 0.43
+    - _ContourLinesFatness: 0.042
+    - _ContourLinesIntervall: 0.82
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _Ka: 0.5
-    - _Kd: 0.5
-    - _Ks: 1
+    - _Ka: 0.435
+    - _Kd: 0.56
+    - _Ks: 0.912
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _ScrollSpeedX: 0.5
-    - _ScrollSpeedY: 0.5
-    - _Shininess: 60
+    - _ScrollSpeedY: 0.7
+    - _Shininess: 55
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
