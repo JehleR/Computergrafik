@@ -188,7 +188,7 @@ Shader "Unlit/ColorTerrainShader"
 
 				// set contour lines
 				if (_UseContourLines == 1) {
-					if (fragIn.worldPos.y > 0 && fragIn.worldPos.y % _ContourLinesIntervall < _ContourLinesFatness) {
+					if (fragIn.worldPos.y > _ContourLinesFatness && fragIn.worldPos.y % _ContourLinesIntervall < _ContourLinesFatness) {
 						color = _ContourLinesColor;
 					}
 				}
