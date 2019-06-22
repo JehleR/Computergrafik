@@ -131,6 +131,12 @@ public class FirstPersonControls : MonoBehaviour {
     void ToogleMovement()
     {
         useMovement = !useMovement;
+        if(useMovement)
+        {
+            // Lock the cursor in the middle of the screen to achieve a fps handling
+            if(Cursor.lockState != CursorLockMode.Locked)
+                Cursor.lockState = CursorLockMode.Locked;
+        }
     }
     /*
     void KeyboardController()
