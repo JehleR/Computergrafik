@@ -6,12 +6,15 @@
 - Raphael Jehle
 - Nathanael Wenzel
 
-## Unity-Version: 2019.1.4f1
+## Unity-Version
+2019.1.4f1
 
-## zu startende Szene:
-"Scene" (befindet sich im Ordner "Scenes")
+## Inbetriebnahme:
+"Scene" (befindet sich im Ordner "Scenes") öffnen
 Anschließend durch das Tor laufen und den Tisch begutachten.
 Hier wird das Mesh erzeugt.
+
+## Sonstiges
 
 **Wichtig:**
 Falls Probleme mit git-LFS o.ä. auftauchen und dadurch nicht alle Objekte sichtbar sind/die Szene nicht ausführbar ist, können wir das Projekt als zip-Ordner privat zur Verfügung stellen (Link: *folgt noch*)
