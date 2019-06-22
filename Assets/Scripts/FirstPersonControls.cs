@@ -37,6 +37,11 @@ public class FirstPersonControls : MonoBehaviour {
         // Stop physics in x and z direction for the camera's body so  there isnt any unwanted movement except for gravity
         physicalParentBody.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
+        xRot = transform.rotation.eulerAngles.y;
+        yRot = transform.rotation.eulerAngles.x;
+        Debug.Log(xRot);
+        Debug.Log(yRot);
+
         // Lock the cursor in the middle of the screen to achieve a fps handling
         if (Cursor.lockState != CursorLockMode.Locked)
             Cursor.lockState = CursorLockMode.Locked;
@@ -49,7 +54,7 @@ public class FirstPersonControls : MonoBehaviour {
         // Free the mouse for debugging
         if (Input.GetKey(KeyCode.Escape))
         {
-            Cursor.lockState = CursorLockMode.None;
+            //Cursor.lockState = CursorLockMode.None;
             ToogleMovement();
         }
 
@@ -68,7 +73,7 @@ public class FirstPersonControls : MonoBehaviour {
         xRot += Mathf.Clamp(rotationSpeed * Input.GetAxis("Mouse X"), minX, maxX);
         yRot -= Mathf.Clamp(rotationSpeed * Input.GetAxis("Mouse Y"), minY, maxY);
 
-        yRot = Mathf.Clamp(yRot, -90, 90);
+        //yRot = Mathf.Clamp(yRot, -90, 90);
 
         // Get a euler quanternion object, which saves a transformation without the z-axis.
         // This is used so the camera doesnt start to tilt and stays in some form parallel to the ground like in common fps games.
@@ -84,6 +89,14 @@ public class FirstPersonControls : MonoBehaviour {
     // Function handeling different Keyevents.
     void KeyboardController()
     {
+        if(Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            movementSpeed /= 3;
+        }
+        if(Input.GetKeyUp(KeyCode.LeftControl))
+        {
+            movementSpeed *= 3;
+        }
 
         // Standard movement keys and the movement applied when pressing them
         if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
@@ -133,33 +146,12 @@ public class FirstPersonControls : MonoBehaviour {
         useMovement = !useMovement;
         if(useMovement)
         {
-            // Lock the cursor in the middle of the screen to achieve a fps handling
-            if(Cursor.lockState != CursorLockMode.Locked)
-                Cursor.lockState = CursorLockMode.Locked;
+            // Lock mouse for First Person control view
+            Cursor.lockState = CursorLockMode.Locked;
+        } else
+        {
+            // Free the mouse
+            Cursor.lockState = CursorLockMode.None;
         }
     }
-    /*
-    void KeyboardController()
-    {
-        return 0;
-    }
-    */
-
-    /*
-yaw += speedH * Input.GetAxis("Mouse X");
-pitch -= speedV * Input.GetAxis("Mouse Y");
-
-transform.eulerAngles = new Vector3(pitch, yaw, 0.0f);
-print("Current");
-print(_currentPos);
-Vector3 rotation = new Vector3();
-rotation.y = Mathf.Clamp(Input.GetAxis("Mouse X"), minX, maxX);
-rotation.x = Mathf.Clamp(Input.GetAxis("Mouse Y"), minY, maxY);
-print(rotation);
-Quaternion targetPos = Quaternion.Euler(rotation);
-print("Target");
-print(targetPos);
-transform.rotation = Quaternion.LookRotation(rotation);
-_currentPos = targetPos;
-*/
 }
