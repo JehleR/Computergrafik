@@ -6,9 +6,9 @@
 - Raphael Jehle
 - Nathanael Wenzel
 
-##Unity-Version: 2019.1.4f1
+## Unity-Version: 2019.1.4f1
 
-##zu startende Szene:
+## zu startende Szene:
 "Scene" (befindet sich im Ordner "Scenes")
 Anschließend durch das Tor laufen und den Tisch begutachten.
 Hier wird das Mesh erzeugt.
