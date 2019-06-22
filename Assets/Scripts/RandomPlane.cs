@@ -5,7 +5,7 @@ public class RandomPlane : MonoBehaviour
 {
     public int numberDivisions = 128;
     private float sizeOfGerneratedPlane = 20;
-    public float triangleHeightDiff = 10;
+    public float randomHeightDiff = 10;
     public int offsetHeight = 0;
     public float manipulationSpeed = 5;
     public bool vulcanization = false;
@@ -61,7 +61,8 @@ public class RandomPlane : MonoBehaviour
                 var vertex = vertices[i];
                 var modifier = (float) ((1 / (2 * Math.PI * Math.Pow(variance, 2)))
                     * Math.Exp(-(1.0f / 2)
-                    * ((Math.Pow((vertex.x - centroid.x), 2) / Math.Pow(variance, 2)) + (Math.Pow((vertex.z - centroid.z), 2) / Math.Pow(variance, 2)))
+                    * ((Math.Pow((vertex.x - centroid.x), 2) / Math.Pow(variance, 2)) 
+                    + (Math.Pow((vertex.z - centroid.z), 2) / Math.Pow(variance, 2)))
                     )
                     );
                 vertex.y += modifier * speed;
@@ -76,10 +77,12 @@ public class RandomPlane : MonoBehaviour
             for(var i = 0; i < vertices.Length; i++)
             {
                 var vertex = vertices[i];
-                var distance = Math.Sqrt(Math.Pow(centroid.x - vertex.x, 2) + Math.Pow(centroid.z - vertex.z, 2));
+                var distance = Math.Sqrt(Math.Pow(centroid.x - vertex.x, 2) 
+                    + Math.Pow(centroid.z - vertex.z, 2));
                 var modifier = (float) ((1 / (2 * Math.PI * Math.Pow(variance, 2)))
                     * Math.Exp(-(1.0f / 2)
-                    * ((Math.Pow((vertex.x - centroid.x), 2) / Math.Pow(variance, 2)) + (Math.Pow((vertex.z - centroid.z), 2) / Math.Pow(variance, 2)))
+                    * ((Math.Pow((vertex.x - centroid.x), 2) / Math.Pow(variance, 2)) 
+                    + (Math.Pow((vertex.z - centroid.z), 2) / Math.Pow(variance, 2)))
                     )
                     );
                 if(distance <= variance)
@@ -132,8 +135,10 @@ public class RandomPlane : MonoBehaviour
         {
             for(int j = 0; j <= numberDivisions; j++)
             {
-                vertices[i * (numberDivisions + 1) + j] = new Vector3(-halfSize + j * divisionSize, 0.0f, halfSize - i * divisionSize);
-                uv[i * (numberDivisions + 1) + j] = new Vector2((float) i / numberDivisions, (float) j / numberDivisions);
+                vertices[i * (numberDivisions + 1) + j] = new Vector3(-halfSize + j 
+                    * divisionSize, 0.0f, halfSize - i * divisionSize);
+                uv[i * (numberDivisions + 1) + j] = new Vector2((float) i 
+                    / numberDivisions, (float) j / numberDivisions);
 
                 if(i < numberDivisions && j < numberDivisions)
                 {
@@ -153,15 +158,19 @@ public class RandomPlane : MonoBehaviour
             }
         }
 
-        vertices[0].y = UnityEngine.Random.Range(-triangleHeightDiff, triangleHeightDiff) + offsetHeight;
-        vertices[numberDivisions].y = UnityEngine.Random.Range(-triangleHeightDiff, triangleHeightDiff) + offsetHeight;
-        vertices[vertices.Length - 1].y = UnityEngine.Random.Range(-triangleHeightDiff, triangleHeightDiff) + offsetHeight;
-        vertices[vertices.Length - 1 - numberDivisions].y = UnityEngine.Random.Range(-triangleHeightDiff, triangleHeightDiff) + offsetHeight;
+        vertices[0].y = UnityEngine.Random.Range(-randomHeightDiff, randomHeightDiff) 
+            + offsetHeight;
+        vertices[numberDivisions].y = UnityEngine.Random.Range(-randomHeightDiff, 
+            randomHeightDiff) + offsetHeight;
+        vertices[vertices.Length - 1].y = UnityEngine.Random.Range(-randomHeightDiff, 
+            randomHeightDiff) + offsetHeight;
+        vertices[vertices.Length - 1 - numberDivisions].y = 
+            UnityEngine.Random.Range(-randomHeightDiff, randomHeightDiff) + offsetHeight;
 
         int iterations = (int) Mathf.Log(numberDivisions, 2);
         int numSquares = 1;
         int squareSize = numberDivisions;
-        float tmpMaximumGenerateHeight = triangleHeightDiff;
+        float tmpMaximumGenerateHeight = randomHeightDiff;
         for(int i = 0; i < iterations; i++)
         {
             int row = 0;
@@ -170,7 +179,13 @@ public class RandomPlane : MonoBehaviour
                 int col = 0;
                 for(int k = 0; k < numSquares; k++)
                 {
-                    DiamondSquareAlgorithm(ref vertices, row, col, squareSize, tmpMaximumGenerateHeight);
+                    DiamondSquareAlgorithm(
+                        ref vertices, 
+                        row, 
+                        col, 
+                        squareSize, 
+                        tmpMaximumGenerateHeight
+                    );
                     col += squareSize;
 
                 }
@@ -202,12 +217,22 @@ public class RandomPlane : MonoBehaviour
         int pointLeftBottom = (row + size) * (numberDivisions + 1) + col;
 
         int middle = (row + halfSquareSize) * (numberDivisions + 1) + col + halfSquareSize;
-        vertices[middle].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y + vertices[pointLeftBottom].y + vertices[pointLeftBottom + size].y) * 0.25f + UnityEngine.Random.Range(-offset, offset);
+        vertices[middle].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y + 
+            vertices[pointLeftBottom].y + vertices[pointLeftBottom + size].y) * 0.25f + 
+            UnityEngine.Random.Range(-offset, offset);
 
-        vertices[pointLeftTop + halfSquareSize].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y + vertices[middle].y) / 3 + UnityEngine.Random.Range(-offset, offset);
-        vertices[middle - halfSquareSize].y = (vertices[pointLeftTop].y + vertices[pointLeftBottom].y + vertices[middle].y) / 3 + UnityEngine.Random.Range(-offset, offset);
-        vertices[middle + halfSquareSize].y = (vertices[pointLeftTop + size].y + vertices[pointLeftBottom + size].y + vertices[middle].y) / 3 + UnityEngine.Random.Range(-offset, offset);
-        vertices[pointLeftBottom + halfSquareSize].y = (vertices[pointLeftBottom].y + vertices[pointLeftBottom + size].y + vertices[middle].y) / 3 + UnityEngine.Random.Range(-offset, offset);
+        vertices[pointLeftTop + halfSquareSize].y = (vertices[pointLeftTop].y + 
+            vertices[pointLeftTop + size].y + vertices[middle].y) / 3 
+            + UnityEngine.Random.Range(-offset, offset);
+        vertices[middle - halfSquareSize].y = (vertices[pointLeftTop].y + 
+            vertices[pointLeftBottom].y + vertices[middle].y) / 3 
+            + UnityEngine.Random.Range(-offset, offset);
+        vertices[middle + halfSquareSize].y = (vertices[pointLeftTop + size].y 
+            + vertices[pointLeftBottom + size].y + vertices[middle].y) / 3 
+            + UnityEngine.Random.Range(-offset, offset);
+        vertices[pointLeftBottom + halfSquareSize].y = (vertices[pointLeftBottom].y 
+            + vertices[pointLeftBottom + size].y + vertices[middle].y) / 3 
+            + UnityEngine.Random.Range(-offset, offset);
 
 
     }
