@@ -929,8 +929,6 @@ MonoBehaviour:
   maxY: 90
   xRot: 0
   yRot: 0
-  useGravity: 0
-  useMovement: 1
 --- !u!82 &170864479
 AudioSource:
   m_ObjectHideFlags: 0
@@ -946,7 +944,7 @@ AudioSource:
   m_Volume: 1
   m_Pitch: 1
   Loop: 1
-  Mute: 1
+  Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128

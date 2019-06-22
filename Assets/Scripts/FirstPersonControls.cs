@@ -17,6 +17,7 @@ public class FirstPersonControls : MonoBehaviour {
 
     private GameObject physicalParent;
     private Rigidbody physicalParentBody;
+    private AudioSource audioSource;
 
     // Use this for initialization
     void Start() {
@@ -45,17 +46,14 @@ public class FirstPersonControls : MonoBehaviour {
         if (Cursor.lockState != CursorLockMode.Locked)
             Cursor.lockState = CursorLockMode.Locked;
 
+        // get audio source
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Free the mouse for debugging
-        if (Input.GetKey(KeyCode.Escape))
-        {
-            //Cursor.lockState = CursorLockMode.None;
-            ToogleMovement();
-        }
+        ShortcutHandler();
 
         if(useMovement)
         {
@@ -120,6 +118,19 @@ public class FirstPersonControls : MonoBehaviour {
 
         if (Input.GetKey(KeyCode.LeftShift))
             physicalParent.transform.localPosition -= new Vector3(0, 1, 0) * Time.deltaTime * movementSpeed;
+    }
+
+    void ShortcutHandler()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToogleMovement();
+        }
+        if(Input.GetKeyDown(KeyCode.M))
+        {
+            // toggle music
+            audioSource.mute = !audioSource.mute;
+        }
     }
 
     // Function handling the basing gravity toggle
