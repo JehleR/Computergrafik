@@ -73,7 +73,7 @@ public class FirstPersonControls : MonoBehaviour {
         xRot += Mathf.Clamp(rotationSpeed * Input.GetAxis("Mouse X"), minX, maxX);
         yRot -= Mathf.Clamp(rotationSpeed * Input.GetAxis("Mouse Y"), minY, maxY);
 
-        //yRot = Mathf.Clamp(yRot, -90, 90);
+        yRot = Mathf.Clamp(yRot, -90, 90);
 
         // Get a euler quanternion object, which saves a transformation without the z-axis.
         // This is used so the camera doesnt start to tilt and stays in some form parallel to the ground like in common fps games.
