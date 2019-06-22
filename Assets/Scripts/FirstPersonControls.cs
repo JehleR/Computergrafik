@@ -11,8 +11,9 @@ public class FirstPersonControls : MonoBehaviour {
     // Max Rotation Values
     public float minX = -360F, maxX = 360F, minY = -90, maxY = 90;
     public float xRot = 0, yRot = 0;
-    public bool useGravity = false;
-    public bool useMovement = true;
+
+    private bool useGravity = false;
+    private bool useMovement = true;
 
     private GameObject physicalParent;
     private Rigidbody physicalParentBody;
@@ -39,8 +40,6 @@ public class FirstPersonControls : MonoBehaviour {
 
         xRot = transform.rotation.eulerAngles.y;
         yRot = transform.rotation.eulerAngles.x;
-        Debug.Log(xRot);
-        Debug.Log(yRot);
 
         // Lock the cursor in the middle of the screen to achieve a fps handling
         if (Cursor.lockState != CursorLockMode.Locked)

@@ -23,7 +23,7 @@ public class RandomPlane : MonoBehaviour
     private MeshCollider meshCollider;
 
     // Line Renderer for Laser
-    private LineRenderer laserLineRenderer;
+    private LineRenderer laser;
 
     // clicked vertex
     Vector3? clickedVertex = null;
@@ -41,17 +41,16 @@ public class RandomPlane : MonoBehaviour
         offset = transform.position;
 
         //create Line Renderer for laser
-        laserLineRenderer = gameObject.AddComponent<LineRenderer>();
-        // laser width
-        float laserWidth = 0.3f;
+        laser = gameObject.AddComponent<LineRenderer>();
         // init with empty positions
         Vector3[] initLaserPositions = new Vector3[2] { Vector3.zero, Vector3.zero };
         // assign values to line renderer
-        laserLineRenderer.SetPositions(initLaserPositions);
-        // set assigned size
-        laserLineRenderer.SetWidth(laserWidth, laserWidth);
+        laser.SetPositions(initLaserPositions);
+        // set laser size
+        laser.startWidth = 0.3f;
+        laser.endWidth = 0.3f;
         // color red
-        laserLineRenderer.material.color = Color.red;
+        laser.material.color = Color.red;
     }
 
     // Update is called once per frame
@@ -84,7 +83,7 @@ public class RandomPlane : MonoBehaviour
             meshCollider.sharedMesh = mesh;
 
             // remove laser line
-            laserLineRenderer.enabled = false;
+            laser.enabled = false;
         }
     }
 
@@ -105,11 +104,11 @@ public class RandomPlane : MonoBehaviour
             clickedVertex = hit.point;
 
             // start position for laser ray
-            laserLineRenderer.SetPosition(0, ray.origin);
+            laser.SetPosition(0, ray.origin);
             // end position for laser ray
-            laserLineRenderer.SetPosition(1, clickedVertex);
+            laser.SetPosition(1, clickedVertex);
             // draw line
-            laserLineRenderer.enabled = true;
+            laser.enabled = true;
         }
 
         // return clicked vertice or empty
@@ -264,7 +263,13 @@ public class RandomPlane : MonoBehaviour
                 for(int k = 0; k < numSquares; k++)
                 {
                     // calculate new center and border values
-                    DiamondSquareAlgorithm(ref vertices, row, col, squareSize, tmpMaximumGenerateHeight);
+                    DiamondSquareAlgorithm(
+                        ref vertices, 
+                        row, 
+                        col, 
+                        squareSize, 
+                        tmpMaximumGenerateHeight
+                    );
 
                     col += squareSize;
 
@@ -326,9 +331,12 @@ public class RandomPlane : MonoBehaviour
         int middle = (row + halfSquareSize) * (numberDivisions + 1) + col + halfSquareSize;
 
         // calculate center value
-        vertices[middle].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y + vertices[pointLeftBottom].y + vertices[pointLeftBottom + size].y) * 0.25f + UnityEngine.Random.Range(-offset, offset);
+        vertices[middle].y = (vertices[pointLeftTop].y + vertices[pointLeftTop + size].y 
+            + vertices[pointLeftBottom].y + vertices[pointLeftBottom + size].y) * 0.25f 
+            + UnityEngine.Random.Range(-offset, offset);
 
-        // calculate new squares | up center | middle left | middle right | down center --> 4 new squares out of one
+        // calculate new squares | up center | middle left | middle right | down center 
+        // --> 4 new squares out of one
         vertices[pointLeftTop + halfSquareSize].y = (vertices[pointLeftTop].y 
             + vertices[pointLeftTop + size].y + vertices[middle].y) / 3 
             + UnityEngine.Random.Range(-offset, offset);
