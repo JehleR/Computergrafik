@@ -20,7 +20,8 @@ Shader "Unlit/ColorTerrainShader"
 		_ColorTex("Color Texture", 2D) = "white" {}
 		// create checkbox for enabling contour lines
 		// https://gist.github.com/smkplus/2a5899bf415e2b6bf6a59726bb1ae2ec
-		[Enum(None, 0, Vertical, 1, Horizontal, 2)] _UseContourLines("Show contour lines", Float) = 0
+		[Enum(None, 0, Vertical, 1, Horizontal, 2)] 
+		_UseContourLines("Show contour lines", Float) = 0
 		// Contour lines intervall
 		_ContourLinesIntervall("Contour Lines Intervall", Range(0, 10)) = 1
 		// Contour Lines Fatness
@@ -118,7 +119,8 @@ Shader "Unlit/ColorTerrainShader"
 				half3 worldNormal = UnityObjectToWorldNormal(vertexIn.normal);
 
 				// compute bitangent from cross product of normal and tangent
-				// bitanget vector is needed to convert the normal from the normal map into world space
+				// bitanget vector is needed to convert the normal from the normal map
+				// into world space
 				half tangentSign = vertexIn.tangent.w * unity_WorldTransformParams.w;
 				half3 wBitangent = cross(worldNormal, wTangent) * tangentSign;
 
@@ -139,7 +141,9 @@ Shader "Unlit/ColorTerrainShader"
 				half3 worldNormal;
 				if (fragIn.worldPos.y > 0) {
 					// set color based on height
-					color = fragIn.worldPos.y < 10 ? tex2Dlod(_ColorTex, float4(0, fragIn.worldPos.y / 10, 0, 0)) : tex2Dlod(_ColorTex, float4(0, 0.99, 0, 0));
+					color = fragIn.worldPos.y < 10 
+						? tex2Dlod(_ColorTex, float4(0, fragIn.worldPos.y / 10, 0, 0)) 
+						: tex2Dlod(_ColorTex, float4(0, 0.99, 0, 0));
 					// transform normal vectors to world coordinates
 					worldNormal = UnityObjectToWorldNormal(fragIn.normal);
 				}
@@ -150,8 +154,10 @@ Shader "Unlit/ColorTerrainShader"
 					float yOffset = _ScrollSpeedY * _Time;
 
 					// sample the normal map, and decode from the Unity encoding
-					half3 tnormal = UnpackNormal(tex2D(_BumpMap, fragIn.uv + float2(xOffset, yOffset * 0.5)));
-					half3 tnormal2 = UnpackNormal(tex2D(_BumpMap2, fragIn.uv + float2(xOffset, yOffset)));
+					half3 tnormal = UnpackNormal(tex2D(_BumpMap, fragIn.uv 
+						+ float2(xOffset, yOffset * 0.5)));
+					half3 tnormal2 = UnpackNormal(tex2D(_BumpMap2, fragIn.uv 
+						+ float2(xOffset, yOffset)));
 
 					// add both normal maps
 					tnormal = (tnormal + tnormal2) / 2;
@@ -172,9 +178,10 @@ Shader "Unlit/ColorTerrainShader"
 				float4 diff = nl * _LightColor0;
 
 				// get reflected light
-				float3 worldSpaceReflection = reflect(normalize(-_WorldSpaceLightPos0.xyz), worldNormal);
+				float3 worldSpaceReflection = reflect(normalize(-_WorldSpaceLightPos0.xyz),
+					worldNormal);
 
-				// claculate specular light
+				// calculate specular light
 				half re = pow(max(dot(worldSpaceReflection, fragIn.worldViewDir), 0), _Shininess);
 				float4 spec = re * _LightColor0;
 
@@ -188,7 +195,8 @@ Shader "Unlit/ColorTerrainShader"
 
 				// set contour lines
 				if (_UseContourLines == 1) {
-					if (fragIn.worldPos.y > _ContourLinesFatness && fragIn.worldPos.y % _ContourLinesIntervall < _ContourLinesFatness) {
+					if (fragIn.worldPos.y > _ContourLinesFatness && 
+						fragIn.worldPos.y % _ContourLinesIntervall < _ContourLinesFatness) {
 						color = _ContourLinesColor;
 					}
 				}
@@ -196,7 +204,6 @@ Shader "Unlit/ColorTerrainShader"
 				//clamps the value so that it is never larger than 1.0 and never smaller than 0.0
 				return saturate(color);
 			}
-
 			ENDCG
 		}
 	}
