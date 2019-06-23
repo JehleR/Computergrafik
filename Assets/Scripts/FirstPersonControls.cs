@@ -21,7 +21,6 @@ public class FirstPersonControls : MonoBehaviour {
     private GameObject physicalParent;
     private Rigidbody physicalParentBody;
     private AudioSource audioSource;
-    private Renderer planeRenderer;
 
     // Use this for initialization
     void Start() {
@@ -52,9 +51,6 @@ public class FirstPersonControls : MonoBehaviour {
 
         // get audio source
         audioSource = GetComponent<AudioSource>();
-
-        // get plane Renderer to access Shader variables
-        planeRenderer = plane.GetComponent<Renderer>();
     }
 
     // Update is called once per frame
@@ -140,10 +136,20 @@ public class FirstPersonControls : MonoBehaviour {
         }
         if(Input.GetKeyDown(KeyCode.C))
         {
+            // get plane Renderer to access Shader variables
+            Renderer planeRenderer;
+            planeRenderer = plane.GetComponent<Renderer>();
             // toggle contour lines
             var contourLines = planeRenderer.material.GetFloat("_UseContourLines");
             contourLines = contourLines > 0 ? 0 : 1;
             plane.GetComponent<Renderer>().material.SetFloat("_UseContourLines", contourLines);
+        }
+        if(Input.GetKeyDown(KeyCode.V))
+        {
+            // get plane script to have access to public variables
+            var planeScript = plane.GetComponent<RandomPlane>();
+            // toggle vulcanization
+            planeScript.vulcanization = !planeScript.vulcanization;
         }
     }
 
