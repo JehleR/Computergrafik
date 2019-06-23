@@ -123,6 +123,7 @@ public class RandomPlane : MonoBehaviour
         Vector3[] vertices = mesh.vertices;
         // calculate variance depending on Height of the clicked vertice
         var variance = 1 + centroid.y / 5;
+        var movementSpeed = speed * variance;
 
         // standard Gauss manipulation
         if(!vulcanization)
@@ -139,7 +140,7 @@ public class RandomPlane : MonoBehaviour
                     )
                     );
                 // calculate new Height for the vertice
-                vertex.y += modifier * speed;
+                vertex.y += modifier * movementSpeed;
                 // vertices under 0.001 set to zero to avoid a big radius
                 setHeightToZero(ref vertex, 0.001f);
                 // replace the old mesh vertice with the new
@@ -165,16 +166,17 @@ public class RandomPlane : MonoBehaviour
                 // check if vertice is inside the vulcan cone
                 if(distance <= variance)
                 {
-                    // if inside --> reduce height by value
-                    // only allow one direction (building the vulcan)
-                    vertex.y += modifier * -Mathf.Abs(speed) * variance;
+                    // if inside --> reduce height by value --> negative speed
+                    // ignore teh mousewheel direction
+                    movementSpeed = -Mathf.Abs(movementSpeed);
                 }
                 else
                 {
-                    // if outside --> add height
-                    // only allow one direction (building the vulcan)
-                    vertex.y += modifier * Mathf.Abs(speed) * variance;
+                    // if outside --> add height --> positive value
+                    // ignore teh mousewheel direction
+                    movementSpeed = Mathf.Abs(movementSpeed);
                 }
+                vertex.y += modifier * movementSpeed * variance;
                 // vertices under 0.001 set to zero to avoid a big radius
                 setHeightToZero(ref vertex, 0.001f);
                 // replace the old mesh vertice with the new
