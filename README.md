@@ -28,6 +28,6 @@ folgende Bewegungen und Shortcuts sind verfügbar:
 * Schleichen - StrgL (control left)
 * Musik an/aus - M (mute)
 * Konturlinien an/aus - C
-* Vulkanisierung an/aus - V (Konstrukte erstellen, die ähnlich wie Vulkane aussehen. Funktioniert nur bei schon vorhandenen Bergen. Auf Vertex klciken und das Mausrad bewegen um den Effekt zu erhalten)
+* Vulkanisierung an/aus - V (Konstrukte erstellen, die ähnlich wie Vulkane aussehen. Auf Vertex klicken und das Mausrad bewegen um den Effekt zu erhalten)
 * Schwerkraft an/aus - G
 * Maus fangen/befreien - Esc
