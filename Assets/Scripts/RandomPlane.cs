@@ -166,12 +166,14 @@ public class RandomPlane : MonoBehaviour
                 if(distance <= variance)
                 {
                     // if inside --> reduce height by value
-                    vertex.y += modifier * -speed * variance;
+                    // only allow one direction (building the vulcan)
+                    vertex.y += modifier * -Mathf.Abs(speed) * variance;
                 }
                 else
                 {
                     // if outside --> add height
-                    vertex.y += modifier * speed * variance;
+                    // only allow one direction (building the vulcan)
+                    vertex.y += modifier * Mathf.Abs(speed) * variance;
                 }
                 // vertices under 0.001 set to zero to avoid a big radius
                 setHeightToZero(ref vertex, 0.001f);
