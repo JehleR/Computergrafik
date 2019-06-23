@@ -141,9 +141,9 @@ Shader "Unlit/ColorTerrainShader"
 				half3 worldNormal;
 				if (fragIn.worldPos.y > 0) {
 					// set color based on height
-					color = fragIn.worldPos.y < 10 
-						? tex2Dlod(_ColorTex, float4(0, fragIn.worldPos.y / 10, 0, 0)) 
-						: tex2Dlod(_ColorTex, float4(0, 0.99, 0, 0));
+					color = fragIn.worldPos.y < 9.9
+						? tex2Dlod(_ColorTex, float4(0, fragIn.worldPos.y / 10, 0, 0))
+						: tex2Dlod(_ColorTex, float4(0, 9.9 / 10, 0, 0));
 					// transform normal vectors to world coordinates
 					worldNormal = UnityObjectToWorldNormal(fragIn.normal);
 				}

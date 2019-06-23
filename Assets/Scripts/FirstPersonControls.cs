@@ -140,9 +140,12 @@ public class FirstPersonControls : MonoBehaviour {
             Renderer planeRenderer;
             planeRenderer = plane.GetComponent<Renderer>();
             // toggle contour lines
-            var contourLines = planeRenderer.material.GetFloat("_UseContourLines");
+            // use sharedMaterial, because the "normal" material variable (planeRenderer.material)
+            // will clone the shared material and start using it from now on
+            // --> no direct access through the shader anymore
+            var contourLines = planeRenderer.sharedMaterial.GetFloat("_UseContourLines");
             contourLines = contourLines > 0 ? 0 : 1;
-            plane.GetComponent<Renderer>().material.SetFloat("_UseContourLines", contourLines);
+            plane.GetComponent<Renderer>().sharedMaterial.SetFloat("_UseContourLines", contourLines);
         }
         if(Input.GetKeyDown(KeyCode.V))
         {
