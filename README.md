@@ -17,7 +17,7 @@ Hier wird das Mesh erzeugt.
 ## Sonstiges
 
 **Wichtig:**
-Falls Probleme mit git-LFS o.ä. auftauchen und dadurch nicht alle Objekte sichtbar sind/die Szene nicht ausführbar ist, können wir das Projekt als zip-Ordner privat zur Verfügung stellen (Link: *folgt noch*)
+Falls Probleme mit git-LFS o.ä. auftauchen und dadurch nicht alle Objekte sichtbar sind/die Szene nicht ausführbar ist, können wir das Projekt als zip-Ordner privat zur Verfügung stellen ([hier](https://drive.google.com/file/d/1UGK7sLTsGsciEIO4Lnqgl7w2uyMIwwta/view?usp=sharing))
 
 **Bemerkung:**
 Das Kamera-Skript wurde kopiert und erweitert um z.B. Shortcuts.
