@@ -9,7 +9,7 @@
 ## Unity-Version
 2019.1.4f1
 
-## Inbetriebnahme:
+## Inbetriebnahme
 "Scene" (befindet sich im Ordner "Scenes") öffnen.\
 Anschließend durch das Tor laufen und den Tisch begutachten.\
 Hier wird das Mesh erzeugt.
